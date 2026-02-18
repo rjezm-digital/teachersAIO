@@ -2258,23 +2258,8 @@
       renderAttendance();
       renderSubjects();
       renderGrades();
-      function bindGradeInputs() {
-  document.querySelectorAll('.grade-input').forEach(input => {
-    if (input.dataset.bound) return;
-    input.dataset.bound = "1";
-
-    input.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        addScore(
-          e.target.dataset.sid,
-          e.target.dataset.type,
-          e.target.value
-        );
-        e.target.value = '';
-      }
-    });
-  });
-}
+      bindGradeInputs();
+      
       renderSeating();
       stats();
       updateEditability();
