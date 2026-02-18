@@ -1612,9 +1612,33 @@
         return `
           <tr>
             <td><a href="#" class="student-link" data-student-id="${id}" style="color: #3b82f6; cursor: pointer;">${s.name}</a></td>
-            <td style="text-align: center;"><span style="background: #f0f4ff; padding: 4px 8px; border-radius: 4px;">${avg(g.quiz).toFixed(1)}</span></td>
-            <td style="text-align: center;"><span style="background: #f0f4ff; padding: 4px 8px; border-radius: 4px;">${avg(g.exam).toFixed(1)}</span></td>
-            <td style="text-align: center;"><span style="background: #f0f4ff; padding: 4px 8px; border-radius: 4px;">${avg(g.project).toFixed(1)}</span></td>
+            <td style="text-align: center;"><input
+    type="text"
+    placeholder="e.g. 85 or 17/20"
+    class="input text-xs w-20 text-center"
+    onkeydown="if(event.key==='Enter'){addScore('${id}','quiz',this.value);this.value=''}"
+  />
+  <div class="text-xs text-gray-500 mt-1">
+    Avg: ${g.quiz.length ? avg(g.quiz).toFixed(1) : '-'}
+  </div>
+            <td style="text-align: center;"><input
+    type="text"
+    placeholder="e.g. 85 or 17/20"
+    class="input text-xs w-20 text-center"
+    onkeydown="if(event.key==='Enter'){addScore('${id}','exam',this.value);this.value=''}"
+  />
+  <div class="text-xs text-gray-500 mt-1">
+    Avg: ${g.exam.length ? avg(g.exam).toFixed(1) : '-'}
+  </div>
+            <td style="text-align: center;"><input
+    type="text"
+    placeholder="e.g. 85 or 17/20"
+    class="input text-xs w-20 text-center"
+    onkeydown="if(event.key==='Enter'){addScore('${id}','project',this.value);this.value=''}"
+  />
+  <div class="text-xs text-gray-500 mt-1">
+    Avg: ${g.project.length ? avg(g.project).toFixed(1) : '-'}
+  </div>
             <td style="text-align: center;"><strong style="font-size: 14px; color: #667eea;">${final}</strong></td>
             <td style="text-align: center;"><strong style="font-size: 14px;">${rank}</strong></td>
           </tr>
