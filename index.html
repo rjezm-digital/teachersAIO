@@ -1593,14 +1593,7 @@
         const g = data.grades[activeClass]?.[id]?.[subject]?.[quarter] || { quiz: [], exam: [], project: [] };
 
         const hasScores = g.quiz.length > 0 || g.exam.length > 0 || g.project.length > 0;
-        if (!hasScores) {
-          return `
-            <tr>
-              <td>${s.name}</td>
-              <td colspan="5" style="text-align:center;color:#9ca3af;">
-                No grades yet
-              </td>
-            </tr>
+        
           `;
         }
 
@@ -2247,13 +2240,27 @@
       renderAttendance();
       renderSubjects();
       renderGrades();
+      bindGradeInputs();
       renderSeating();
       stats();
       updateEditability();
       forceEnableBootstrapActions();
       applyClassLock();
       attachEventListeners();
-    }
+    }function bindGradeInputs() {
+  document.querySelectorAll('.grade-input').forEach(input => {
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        addScore(
+          e.target.dataset.sid,
+          e.target.dataset.type,
+          e.target.value
+        );
+        e.target.value = '';
+      }
+    });
+  });
+}
 
     function attachEventListeners() {
       if (eventsBound) return;
@@ -2385,6 +2392,5 @@
         // fail silently
       }
     });
-  </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9cfe3fe351a9febc',t:'MTc3MTQyNTMxMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+  </body>
 </html>
