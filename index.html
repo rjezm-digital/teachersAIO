@@ -165,8 +165,7 @@
     #parent-share-modal .qr-container { text-align: center; margin-bottom: 16px; }
     #parent-share-modal .qr-container img { max-width: 200px; }
   </style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
-  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+
  </head>
  <body class="h-full">
   <div id="parentBanner" style="
@@ -2236,23 +2235,6 @@
           new Date().toISOString().slice(0, 10);
       if (section === 'grades') renderSubjects();
     }
-
-    function render() {
-      renderSchoolYears();
-      renderNav();
-      renderGlobalClass();
-      renderClasses();
-      renderStudents();
-      renderAttendance();
-      renderSubjects();
-      renderGrades();
-      bindGradeInputs();
-      renderSeating();
-      stats();
-      updateEditability();
-      forceEnableBootstrapActions();
-      applyClassLock();
-      attachEventListeners();
     }function bindGradeInputs() {
   document.querySelectorAll('.grade-input').forEach(input => {
     input.addEventListener('keydown', e => {
@@ -2267,6 +2249,39 @@
     });
   });
 }
+    function render() {
+      renderSchoolYears();
+      renderNav();
+      renderGlobalClass();
+      renderClasses();
+      renderStudents();
+      renderAttendance();
+      renderSubjects();
+      renderGrades();
+      function bindGradeInputs() {
+  document.querySelectorAll('.grade-input').forEach(input => {
+    if (input.dataset.bound) return;
+    input.dataset.bound = "1";
+
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        addScore(
+          e.target.dataset.sid,
+          e.target.dataset.type,
+          e.target.value
+        );
+        e.target.value = '';
+      }
+    });
+  });
+}
+      renderSeating();
+      stats();
+      updateEditability();
+      forceEnableBootstrapActions();
+      applyClassLock();
+      attachEventListeners();
+
 
     function attachEventListeners() {
       if (eventsBound) return;
