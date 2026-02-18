@@ -1,0 +1,2366 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teachers AIO</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    * { font-family: Poppins, sans-serif; }
+    body { background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%); box-sizing: border-box; }
+    
+    .btn { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 8px 16px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4); }
+    .btn:active { transform: translateY(0); }
+    .btn.bg-red { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+    .btn.bg-purple { background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%); }
+    .btn.export-btn { display: inline-block; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    .input { border: 2px solid #e5e7eb; padding: 8px 12px; border-radius: 6px; font-size: 14px; transition: all 0.2s ease; }
+    .input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); outline: none; }
+    .input:disabled { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; }
+    
+    .card { background: white; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.12); transition: all 0.2s ease; }
+    
+    #sidebar { width: 320px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 24px; display: flex; flex-direction: column; overflow: hidden; }
+    
+    .sidebar-header { color: white; margin-bottom: 28px; }
+    .sidebar-header h1 { font-size: 26px; font-weight: 700; margin: 0; line-height: 1.2; }
+    .sidebar-header p { font-size: 12px; opacity: 0.85; margin: 6px 0 0 0; }
+    
+    .sidebar-section { margin-bottom: 22px; }
+    .sidebar-section-label { color: rgba(255,255,255,0.6); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 12px; display: block; }
+    
+    .school-selector { background: rgba(255,255,255,0.12); border-radius: 10px; padding: 12px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.2); }
+    .school-selector label { color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 600; display: block; margin-bottom: 8px; }
+    .school-selector select { background: white; color: #333; border: none; padding: 8px 10px; border-radius: 6px; font-size: 13px; width: 100%; font-weight: 500; }
+    .school-selector .flex { gap: 8px; margin-top: 8px; }
+    .school-selector input {
+      background: white;
+      color: #333;
+      border: none;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      width: auto;
+      max-width: 140px;
+    }
+    .school-selector button { background: white; color: #667eea; padding: 8px 12px; border-radius: 6px; border: none; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .school-selector button:hover { background: #f0f0f0; }
+    
+    .class-selector { background: rgba(255,255,255,0.12); border-radius: 10px; padding: 12px; border: 1px solid rgba(255,255,255,0.2); }
+    .class-selector label { color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 600; display: block; margin-bottom: 8px; }
+    .class-selector select { background: white; color: #333; border: none; padding: 8px 10px; border-radius: 6px; font-size: 13px; width: 100%; font-weight: 500; }
+    
+    .lock-status { color: rgba(255,255,255,0.85); font-size: 12px; margin-top: 8px; display: flex; align-items: center; gap: 6px; }
+    .lock-status.locked { color: #fbbf24; }
+    .lock-status.unlocked { color: #4ade80; }
+    
+    #pinBox { background: rgba(255,255,255,0.12); border-radius: 10px; padding: 12px; border: 1px solid rgba(255,255,255,0.2); margin-top: 8px; display: none; }
+    #pinBox.show { display: block; }
+    #pinBox input { width: 100%; margin-bottom: 8px; }
+    #pinBox button { width: 100%; }
+    
+    #nav { display: flex; flex-direction: column; gap: 4px; }
+    .nav-section { margin-bottom: 12px; }
+    .nav-section:last-child { margin-bottom: 0; }
+    .nav-section-title { color: rgba(255,255,255,0.5); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; display: block; padding: 0 4px; }
+    
+    .nav-btn { padding: 12px 14px; border-radius: 8px; border: none; cursor: pointer; font-weight: 500; transition: all 0.2s ease; text-align: left; width: 100%; color: rgba(255,255,255,0.8); background: transparent; font-size: 13px; }
+    .nav-btn:hover { background: rgba(255,255,255,0.15); color: white; }
+    .nav-btn.active { background: rgba(255,255,255,0.25); color: white; box-shadow: inset 0 2px 8px rgba(0,0,0,0.15); font-weight: 600; }
+    
+    #main { flex: 1; padding: 24px 32px; overflow-y: auto; }
+    
+    .stat-card { border-radius: 12px; padding: 24px; color: white; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .stat-card:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .stat-card:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .stat-card:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    .stat-card:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+    
+    .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .badge-active { background: #d1fae5; color: #065f46; }
+    .badge-promoted { background: #d1fae5; color: #065f46; }
+    .badge-conditional { background: #fef3c7; color: #92400e; }
+    .badge-retained { background: #fee2e2; color: #7f1d1d; }
+    
+    .student-item { background: white; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #3b82f6; border: 1px solid #e5e7eb; }
+    
+    .parent-view input:not(input[type="checkbox"]),
+    .parent-view button:not(.export-btn),
+    .parent-view select {
+      display: none !important;
+    }
+
+    .read-only input,
+    .read-only button:not(.export-btn),
+    .read-only select,
+    .read-only textarea {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    .read-only #setPinBtn {
+      pointer-events: auto !important;
+      opacity: 1 !important;
+    }
+    
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #f8fafc; padding: 12px; text-align: left; font-weight: 600; border-bottom: 2px solid #e5e7eb; }
+    td { padding: 12px; border-bottom: 1px solid #e5e7eb; }
+    tbody tr:hover { background: #f9fafb; }
+    
+    .view { animation: fadeIn 0.25s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .hidden { display: none !important; }
+    .archived-badge { background: #fed7aa; color: #92400e; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 8px; }
+    
+    .tour-highlight {
+      position: relative;
+      z-index: 10000;
+      box-shadow: 0 0 0 4px rgba(59,130,246,0.6);
+      border-radius: 8px;
+    }
+    
+    #app { display: flex; flex-direction: column; height: 100%; }
+    #content { display: flex; flex: 1; }
+    
+    @media (max-width: 768px) {
+      #content { flex-direction: column; }
+      #sidebar { width: 100%; border-right: none; border-bottom: 1px solid #e5e7eb; padding: 16px; }
+    }
+    
+    @media print {
+      #sidebar, #footer, button, input[type="file"], input[type="text"], input[type="date"], select, .text-xs { display: none !important; }
+      #app, #content, #main { padding: 0; margin: 0; }
+      #main { flex: none; }
+      .view.hidden { display: block !important; }
+      .view:not(#sf9) { display: none !important; }
+      body { background: white; }
+      .card { box-shadow: none; border: none; }
+      #parentBanner { display: none !important; }
+    }
+
+    #sidebar input,
+    #sidebar select {
+      width: 100%;
+      max-width: 240px;
+    }
+
+    #newSchoolYear {
+      max-width: 140px !important;
+    }
+
+    #parent-share-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 50; align-items: center; justify-content: center; }
+    #parent-share-modal.show { display: flex; }
+    #parent-share-modal .modal-content { background: white; border-radius: 12px; padding: 24px; max-width: 400px; width: 90%; }
+    #parent-share-modal h3 { margin: 0 0 16px 0; font-size: 18px; font-weight: 600; }
+    #parent-share-modal .share-url { background: #f3f4f6; padding: 12px; border-radius: 6px; font-size: 12px; word-break: break-all; margin-bottom: 16px; border: 1px solid #e5e7eb; }
+    #parent-share-modal .qr-container { text-align: center; margin-bottom: 16px; }
+    #parent-share-modal .qr-container img { max-width: 200px; }
+  </style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full">
+  <div id="parentBanner" style="
+         display:none;
+         position:sticky;
+         top:0;
+         z-index:9999;
+         background:linear-gradient(135deg,#2563eb,#1e40af);
+         color:white;
+         padding:10px 14px;
+         font-size:13px;
+         font-weight:600;
+         text-align:center;
+         box-shadow:0 2px 8px rgba(0,0,0,.2);
+       ">
+   👨‍👩‍👧 Parent View – Read Only | This report is for viewing only
+  </div>
+  <div id="app">
+   <div id="content">
+    <aside id="sidebar">
+     <div class="sidebar-header">
+      <h1>Teachers AIO</h1>
+      <p>Classroom Management</p>
+     </div>
+     <div class="sidebar-section"><span class="sidebar-section-label">School Year</span>
+      <div class="school-selector"><select id="schoolYear"></select>
+       <div class="flex"><input id="newSchoolYear" type="number" placeholder="e.g. 2025"> <button id="btnAddSchoolYear">+ Add</button>
+       </div>
+      </div>
+     </div>
+     <div class="sidebar-section"><span class="sidebar-section-label">Current Class</span>
+      <div class="class-selector"><select id="globalClass"> <option value="">Select Class</option> </select>
+       <div class="lock-status" id="lockStatus">
+        🔓 Unlocked
+       </div>
+       <div id="pinBox"><input id="pinInput" placeholder="Enter PIN" type="password" class="input" style="max-width: 100%;"> <button id="btnUnlockClass" class="btn" style="width: 100%; font-size: 12px;">Unlock</button>
+       </div><button id="setPinBtn" class="btn bg-purple text-xs mt-2 editable" style="width: 100%; font-size: 12px;">🔐 Set / Change Class PIN</button>
+      </div>
+     </div>
+     <nav id="nav"></nav>
+    </aside>
+    <main id="main">
+     <section id="dashboard" class="view">
+      <div class="flex items-center gap-3">
+       <h1 class="text-4xl font-bold text-gray-900">Dashboard</h1><span id="yearBadge" class="archived-badge hidden">ARCHIVED YEAR</span>
+      </div>
+      <p class="text-gray-600 mb-8">Quick overview of your classroom</p>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+       <div class="stat-card">
+        <div class="text-sm opacity-90 mb-2">
+         Total Students
+        </div>
+        <div class="text-4xl font-bold" id="stat-students">
+         0
+        </div>
+       </div>
+       <div class="stat-card">
+        <div class="text-sm opacity-90 mb-2">
+         Classes
+        </div>
+        <div class="text-4xl font-bold" id="stat-classes">
+         0
+        </div>
+       </div>
+       <div class="stat-card">
+        <div class="text-sm opacity-90 mb-2">
+         Attendance Records
+        </div>
+        <div class="text-4xl font-bold" id="stat-attendance">
+         0
+        </div>
+       </div>
+       <div class="stat-card">
+        <div class="text-sm opacity-90 mb-2">
+         Grades
+        </div>
+        <div class="text-4xl font-bold" id="stat-grades">
+         0
+        </div>
+       </div>
+      </div>
+     </section>
+     <section id="classes" class="view hidden">
+      <h2 class="text-3xl font-bold text-gray-900 mb-2">Manage Classes</h2>
+      <p class="text-gray-600 mb-8">Create and organize your classes</p>
+      <div class="card p-6 mb-6">
+       <label class="block text-sm font-600 text-gray-700 mb-3">Add New Class</label>
+       <div class="flex gap-3 items-center"><input id="classInput" placeholder="Enter class name" class="input" style="max-width: 260px;"> <button id="btnAddClass" class="btn editable">+ Add Class</button>
+       </div>
+      </div>
+      <div class="text-sm font-600 text-gray-700 mb-4">
+       Your Classes (<span id="classCount">0</span>)
+      </div>
+      <ul id="classList" class="space-y-2"></ul>
+     </section>
+     <section id="students" class="view hidden">
+      <h2 class="text-3xl font-bold text-gray-900 mb-2">Manage Students</h2>
+      <p class="text-gray-600 mb-8">Add and organize your student roster</p>
+      <div class="card p-6 mb-6">
+       <label class="block text-sm font-600 text-gray-700 mb-3">Add New Student</label>
+       <div class="flex gap-3">
+        <input id="studentInput" placeholder="Enter student name" class="input" style="max-width: 260px;"> <button id="btnAddStudent" class="btn editable">+ Add Student</button>
+       </div>
+      </div>
+      <div class="text-sm font-600 text-gray-700 mb-4">
+       Enrolled Students (<span id="studentCount">0</span>)
+      </div>
+      <ul id="studentList" class="space-y-2"></ul>
+     </section>
+     <section id="attendance" class="view hidden">
+      <h2 class="text-3xl font-bold text-gray-900 mb-2">Attendance Records</h2>
+      <p class="text-gray-600 mb-8">Track attendance by date</p>
+      <div class="card p-6 mb-6">
+       <div class="flex gap-3 items-end flex-wrap">
+        <div>
+         <label class="block text-sm font-600 text-gray-700 mb-2">Date</label> <input id="attendanceDate" type="date" class="input">
+        </div><button id="btnMarkAll1" class="btn editable">✓ All Present</button> <button id="btnMarkAll2" class="btn editable bg-red">✗ All Absent</button>
+       </div>
+      </div>
+      <div class="card overflow-x-auto">
+       <table>
+        <thead>
+         <tr>
+          <th>Student</th>
+          <th style="text-align: center;">✓ Present</th>
+          <th style="text-align: center;">✗ Absent</th>
+          <th style="text-align: center;">🕐 Late</th>
+         </tr>
+        </thead>
+        <tbody id="attendanceTable"></tbody>
+       </table>
+      </div>
+     </section>
+     <section id="grades" class="view hidden">
+      <h2 class="text-3xl font-bold text-gray-900 mb-2">Grade Book</h2>
+      <p class="text-gray-600 mb-8">Track quizzes, exams, and projects</p>
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+       <div class="card p-6">
+        <p class="text-sm font-600 text-gray-700 mb-4">⚙️ Grade Weights</p>
+        <div class="space-y-3 mb-4">
+         <div>
+          <label class="text-xs font-600 text-gray-600 mb-1 block">Quiz</label> <input id="wQuiz" type="number" value="30" class="input w-full">
+         </div>
+         <div>
+          <label class="text-xs font-600 text-gray-600 mb-1 block">Exam</label> <input id="wExam" type="number" value="40" class="input w-full">
+         </div>
+         <div>
+          <label class="text-xs font-600 text-gray-600 mb-1 block">Project</label> <input id="wProject" type="number" value="30" class="input w-full">
+         </div>
+        </div><button id="btnSaveWeights" class="btn editable w-full text-sm">Save</button>
+       </div>
+       <div class="card p-6">
+        <h3 class="font-semibold mb-3 text-sm">📘 Transmutation</h3>
+        <div class="flex gap-4 items-center mb-3 text-sm"><label class="flex items-center gap-2"><input type="radio" name="transMode" value="deped"> DepEd</label> <label class="flex items-center gap-2"><input type="radio" name="transMode" value="custom"> Custom</label>
+        </div><button id="btnLockTrans" class="btn bg-red editable w-full text-sm">🔒 Lock</button>
+        <p class="text-xs text-gray-500 mt-2">Cannot change once locked</p>
+       </div>
+       <div class="card p-6">
+        <p class="text-sm font-600 text-gray-700 mb-4">📚 Subject</p><select id="subject" class="input mb-3" style="max-width: 220px;"></select>
+        <div class="flex gap-2 items-center"><input id="newSubject" placeholder="New subject" class="input text-sm" style="max-width: 180px;"> <button id="btnAddSubject" class="btn editable text-sm">+</button>
+        </div>
+       </div>
+       <div class="card p-6">
+        <p class="text-sm font-600 text-gray-700 mb-4">📅 Quarter</p><select id="quarter" class="input w-full mb-3"> <option value="Q1">Q1</option> <option value="Q2">Q2</option> <option value="Q3">Q3</option> <option value="Q4">Q4</option> </select>
+       </div>
+      </div>
+      <div class="card overflow-x-auto">
+       <table>
+        <thead>
+         <tr>
+          <th>Student</th>
+          <th style="text-align: center;">Quiz</th>
+          <th style="text-align: center;">Exam</th>
+          <th style="text-align: center;">Project</th>
+          <th style="text-align: center;">Final</th>
+          <th style="text-align: center;">Rank</th>
+         </tr>
+        </thead>
+        <tbody id="gradesTable"></tbody>
+       </table>
+      </div>
+     </section>
+     <section id="sf9" class="view hidden">
+      <h2 class="text-3xl font-bold text-gray-900 mb-2">SF9 – Report Card</h2>
+      <p class="text-gray-600 mb-8">View and print student report cards</p>
+      <div class="card p-6 mb-6">
+       <label class="text-sm font-600 text-gray-700 mb-2 block">Select Student</label> <select id="sf9Student" class="input w-full max-w-xs"> <option value="">-- Choose Student --</option> </select>
+      </div>
+      <div id="sf9Content" class="card p-6 mb-6"></div>
+      <div class="flex gap-3">
+       <button type="button" class="btn bg-purple export-btn" id="btnPrintSF9"> 🖨️ Save as PDF </button> <button type="button" class="btn bg-purple export-btn" id="btnExportF137"> 📘 Export Form 137 </button> <button type="button" class="btn export-btn" id="btnShareParent" style="display: none;"> 🔗 Share with Parent </button>
+      </div>
+      <p class="text-xs text-gray-500 mt-2">PDF will download automatically with all grades and rankings</p>
+     </section>
+     <section id="seating" class="view hidden">
+      <h2 class="text-3xl font-bold text-gray-900 mb-2">Seating Arrangement</h2>
+      <p class="text-gray-600 mb-8">Drag students to customize seating</p>
+      <div class="card p-6 mb-6">
+       <button id="btnRandomize" class="btn editable">🔄 Randomize</button>
+      </div>
+      <div class="card p-6 mb-6">
+       <p class="text-sm font-600 text-gray-700 mb-4">Classroom Seating (20 seats)</p>
+       <div class="grid grid-cols-5 gap-3" id="seatingGrid"></div>
+      </div>
+      <div class="card p-6">
+       <p class="text-sm font-600 text-gray-700 mb-4">Unseated Students</p>
+       <div class="flex flex-wrap gap-2" id="unseatedList"></div>
+      </div>
+     </section>
+     <section id="school" class="view hidden">
+      <h2 class="text-3xl font-bold text-gray-900 mb-2">School Information</h2>
+      <p class="text-gray-600 mb-8">Configure school details for reports</p>
+      <div class="card p-6 space-y-6">
+       <div>
+        <label class="text-sm font-600 text-gray-700 mb-2 block">School Name</label> <input id="schoolName" type="text" placeholder="Enter school name" class="input w-full">
+       </div>
+       <div>
+        <label class="text-sm font-600 text-gray-700 mb-2 block">Class Adviser</label> <input id="adviser" type="text" placeholder="Enter adviser name" class="input w-full">
+       </div>
+       <div>
+        <label class="text-sm font-600 text-gray-700 mb-2 block">School Logo</label> <input id="logo" type="file" accept="image/*" class="input w-full">
+        <div id="logoPreview" class="mt-4"></div>
+       </div><button id="btnSaveSchool" class="btn editable">💾 Save School Info</button>
+      </div>
+     </section>
+    </main>
+   </div>
+   <footer class="bg-gradient-to-r from-slate-900 to-slate-800 text-white py-4 px-6 text-center text-sm border-t border-slate-700" id="footer">
+    <p>© 2026 <span class="font-semibold text-blue-400">RJEZM DIGITAL</span> • All rights reserved</p>
+   </footer>
+  </div>
+  <div id="student-modal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center">
+   <div class="bg-white w-full max-w-4xl rounded-xl shadow-lg overflow-hidden">
+    <div class="bg-indigo-600 text-white p-4 flex justify-between items-center">
+     <div>
+      <h2 id="sp-name" class="text-xl font-bold"></h2>
+      <p id="sp-class" class="text-sm opacity-90"></p>
+     </div><button id="btnCloseStudentModal" class="text-xl">✕</button>
+    </div>
+    <div class="p-6 space-y-6 max-h-[75vh] overflow-auto">
+     <div class="flex items-center gap-2">
+      <input type="checkbox" id="parent-toggle"> <label for="parent-toggle" class="text-sm font-600">Enable Parent View</label>
+     </div>
+     <div class="flex gap-3">
+      <div class="border-b pb-4 flex-1">
+       <label class="text-sm font-600 text-gray-700 mb-2 block">Student Photo</label> <input id="studentPhotoInput" type="file" accept="image/*" class="input w-full"> <img id="student-photo" class="w-24 h-24 rounded-full object-cover mt-2">
+      </div><button type="button" class="btn bg-purple export-btn" id="btnShareStudent" style="align-self: flex-end; white-space: nowrap;">🔗 Share</button>
+     </div>
+     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+      <div>
+       <b>ID:</b> <span id="pv-id"></span>
+      </div>
+      <div>
+       <b>Birthdate:</b> <span id="pv-birthdate"></span>
+      </div>
+      <div>
+       <b>Guardian:</b> <span id="pv-guardian"></span>
+      </div>
+      <div>
+       <b>Mobile:</b> <span id="pv-mobile"></span>
+      </div>
+     </div>
+     <div class="border-b pb-4 space-y-3">
+      <h3 class="font-semibold">Student Information</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+       <div><label class="text-sm font-600 text-gray-700">Student Name</label> <input id="sp-name-edit" class="input w-full">
+       </div>
+       <div><label class="text-sm font-600 text-gray-700">Student ID</label> <input id="sp-studentId" class="input w-full" placeholder="e.g. 2024-001">
+       </div>
+       <div><label class="text-sm font-600 text-gray-700">Birthdate</label> <input id="sp-birthdate" type="date" class="input w-full">
+       </div>
+       <div><label class="text-sm font-600 text-gray-700">Parent / Guardian</label> <input id="sp-guardian" class="input w-full" placeholder="Parent or Guardian Name">
+       </div>
+       <div><label class="text-sm font-600 text-gray-700">Mobile Number</label> <input id="sp-mobile" class="input w-full" placeholder="09XXXXXXXXX">
+       </div>
+      </div><button id="btnSaveStudent" class="btn editable mt-3">💾 Save Student Info</button>
+     </div>
+     <div class="grid grid-cols-3 gap-4 text-center">
+      <div class="card p-4">
+       <div class="text-sm text-gray-500">
+        General Average
+       </div>
+       <div id="sp-average" class="text-2xl font-bold"></div>
+      </div>
+      <div class="card p-4">
+       <div class="text-sm text-gray-500">
+        Status
+       </div>
+       <div id="sp-status" class="text-lg font-semibold"></div>
+      </div>
+      <div class="card p-4">
+       <div class="text-sm text-gray-500">
+        Overall Rank
+       </div>
+       <div id="sp-rank" class="text-2xl font-bold"></div>
+      </div>
+     </div>
+     <div>
+      <h3 class="font-semibold mb-3">Attendance Summary</h3>
+      <div class="grid grid-cols-3 gap-4 text-center">
+       <div class="card p-3">
+        Present<br><b id="att-present">0</b>
+       </div>
+       <div class="card p-3">
+        Absent<br><b id="att-absent">0</b>
+       </div>
+       <div class="card p-3">
+        Late<br><b id="att-late">0</b>
+       </div>
+      </div>
+     </div>
+     <div>
+      <h3 class="font-semibold mb-2">Quarterly Performance</h3>
+      <table class="w-full text-sm border">
+       <thead class="bg-gray-100">
+        <tr>
+         <th class="p-2 border">Quarter</th>
+         <th class="p-2 border">Final Grade</th>
+         <th class="p-2 border">Rank</th>
+         <th class="p-2 border">Remark</th>
+        </tr>
+       </thead>
+       <tbody id="sp-grades"></tbody>
+      </table>
+     </div>
+     <div>
+      <h3 class="font-semibold mb-3">Assessment Details</h3>
+      <div class="space-y-4" id="grade-details"></div>
+     </div>
+     <div class="card p-4">
+      <h3 class="font-semibold mb-2">📝 Auto-Generated Remarks</h3>
+      <p id="auto-remarks" class="text-sm text-gray-700 leading-relaxed">No data available yet.</p>
+     </div>
+     <div class="border-t pt-4">
+      <h3 class="font-semibold mb-3">Behavior / Notes</h3><textarea id="behavior-note" class="w-full border rounded p-2 input" placeholder="Write a note..."></textarea> <button id="btnAddNote" class="btn editable mt-2">Add Note</button>
+      <ul id="behavior-list" class="mt-3 space-y-2"></ul>
+     </div>
+     <div class="card p-4">
+      <h3 class="font-semibold mb-2">📦 Transfer History</h3>
+      <ul id="transfer-history" class="text-sm space-y-1"></ul>
+     </div><button id="btnTransferStudent" class="btn bg-red editable mt-3"> 🔄 Transfer Student </button> <button id="btnDropStudent" class="btn bg-red editable mt-2"> 🚫 Mark as Dropped </button><button id="btnExportStudent" class="btn export-btn w-full">📄 Export Student PDF</button>
+    </div>
+   </div>
+  </div>
+  <div id="parent-share-modal">
+   <div class="modal-content">
+    <h3>📱 Share with Parent</h3>
+    <div class="share-url" id="shareUrl"></div>
+    <div class="qr-container"><img id="qrCode" alt="QR Code">
+    </div>
+    <div class="modal-actions" style="display:flex; gap:8px; flex-wrap:wrap;"><button class="btn" id="btnCopyShareLink">📋 Copy Link</button> <button class="btn" id="btnShareMessenger">💬 Messenger</button> <button class="btn" id="btnShareSMS">📩 SMS</button> <button class="btn bg-red" id="btnCloseParentShare">Close</button>
+    </div>
+    <p style="font-size:11px;color:#6b7280;margin-top:8px;">Messages are sent using your phone's app. Regular SMS charges may apply.</p>
+   </div>
+  </div>
+  <div id="tour" class="hidden fixed inset-0 z-[9999]">
+   <div class="absolute inset-0 bg-black/40"></div>
+   <div id="tour-box" class="absolute bg-white rounded-lg shadow-xl p-4 max-w-xs text-sm">
+    <div id="tour-text" class="mb-3 font-medium"></div>
+    <div class="flex justify-between items-center"><button id="tour-skip" class="text-gray-500 text-xs">Skip</button> <button id="tour-next" class="btn text-xs">Next</button>
+    </div>
+   </div>
+  </div>
+  <script>
+    let eventsBound = false;
+
+    window.addEventListener("error", (e) => {
+      alert("JS Error: " + e.message);
+    });
+
+    const DEPED_TABLE = [
+      { min: 96, grade: 100 }, { min: 94, grade: 99 }, { min: 92, grade: 98 }, { min: 90, grade: 97 },
+      { min: 88, grade: 96 }, { min: 86, grade: 95 }, { min: 84, grade: 94 }, { min: 82, grade: 93 },
+      { min: 80, grade: 92 }, { min: 78, grade: 91 }, { min: 76, grade: 90 }, { min: 75, grade: 75 },
+      { min: 0, grade: 74 }
+    ];
+
+    const views = [
+      { id: 'dashboard', label: '🏠 Dashboard', section: 'MAIN' },
+      { id: 'classes', label: '🏫 Classes', section: 'MAIN' },
+      { id: 'students', label: '👥 Students', section: 'MAIN' },
+      { id: 'attendance', label: '📊 Attendance', section: 'TRACKING' },
+      { id: 'grades', label: '📕 Grade Book', section: 'TRACKING' },
+      { id: 'sf9', label: '📄 SF9 Report', section: 'REPORTS' },
+      { id: 'seating', label: '🪑 Seating', section: 'TOOLS' },
+      { id: 'school', label: '⚙️ School Info', section: 'SETTINGS' }
+    ];
+
+    const params = new URLSearchParams(location.search);
+
+    // Tour system
+    const tourSteps = [
+      { text: "👋 Welcome! Start by adding your first class here.", section: "classes", selector: "#btnAddClass" },
+      { text: "👥 Next, add students to your class.", section: "students", selector: "#btnAddStudent" },
+      { text: "📄 When ready, generate the SF9 report here.", section: "sf9", selector: "#btnPrintSF9" }
+    ];
+
+    let tourIndex = 0;
+
+    function startTour() {
+      if (localStorage.getItem("tourDone")) return;
+      document.getElementById("tour").classList.remove("hidden");
+      showTourStep();
+    }
+
+    function showTourStep() {
+      document.querySelectorAll(".tour-highlight")
+        .forEach(el => el.classList.remove("tour-highlight"));
+
+      const step = tourSteps[tourIndex];
+
+      // Switch to correct section FIRST
+      viewSection(step.section, null);
+
+      setTimeout(() => {
+        const target = document.querySelector(step.selector);
+        if (!target) return;
+
+        target.classList.add("tour-highlight");
+
+        const rect = target.getBoundingClientRect();
+        const box = document.getElementById("tour-box");
+
+        let top = rect.bottom + 8;
+        let left = rect.left;
+
+        // Keep tour box inside viewport
+        if (left + box.offsetWidth > window.innerWidth) {
+          left = window.innerWidth - box.offsetWidth - 12;
+        }
+        if (top + box.offsetHeight > window.innerHeight) {
+          top = rect.top - box.offsetHeight - 8;
+        }
+
+        box.style.top = `${top}px`;
+        box.style.left = `${left}px`;
+
+        document.getElementById("tour-text").textContent = step.text;
+      }, 250);
+    }
+
+    function endTour() {
+      document.getElementById("tour").classList.add("hidden");
+      document.querySelectorAll(".tour-highlight")
+        .forEach(el => el.classList.remove("tour-highlight"));
+      localStorage.setItem("tourDone", "1");
+    }
+
+    function resetTour() {
+      localStorage.removeItem("tourDone");
+      tourIndex = 0;
+      startTour();
+    }
+
+    function getActiveTransmutationTable() {
+      const t = data.transmutation;
+      return t.mode === "custom" && t.customTable.length ? t.customTable : DEPED_TABLE;
+    }
+
+    function transmuteGrade(raw) {
+      const table = getActiveTransmutationTable();
+      for (const row of table) {
+        if (raw >= row.min) return row.grade;
+      }
+      return 0;
+    }
+
+    function setClassPin() {
+      if (!activeClass || !data.classes[activeClass]) {
+        alert("Please select a class first.");
+        return;
+      }
+      if (isArchivedYear()) return;
+
+      const pin = prompt("Set a 4–6 digit PIN for this class:");
+
+      if (pin === null) return;
+
+      if (!/^\d{4,6}$/.test(pin)) {
+        alert("❌ PIN must be 4–6 digits");
+        return;
+      }
+
+      data.classes[activeClass].pin = pin;
+      data.classes[activeClass].unlocked = false;
+
+      save();
+      applyClassLock();
+
+      alert("✅ Class PIN set successfully");
+    }
+
+    function unlockClass() {
+      if (!activeClass) return;
+
+      const input = document.getElementById("pinInput").value;
+      const classData = data.classes[activeClass];
+
+      if (input === classData.pin) {
+        classData.unlocked = true;
+        document.getElementById("pinInput").value = "";
+        save();
+        applyClassLock();
+      } else {
+        alert("❌ Incorrect PIN");
+      }
+    }
+
+    function lockTransmutation() {
+      const q = document.getElementById("quarter").value;
+
+      if (data.transmutation.locked[q]) {
+        alert("❌ Transmutation already locked for " + q);
+        return;
+      }
+
+      if (!confirm("Lock transmutation for " + q + "? This cannot be undone.")) return;
+
+      data.transmutation.locked[q] = true;
+      save();
+      renderGrades();
+    }
+
+    function setTransmutationMode(mode) {
+      const q = document.getElementById("quarter").value;
+      if (data.transmutation.locked[q]) {
+        alert("❌ Transmutation is locked for " + q);
+        document.querySelectorAll('input[name="transMode"]').forEach(r => r.checked = false);
+        return;
+      }
+      data.transmutation.mode = mode;
+      save();
+      renderGrades();
+    }
+
+    function transmutationStatusBadge() {
+      const q = document.getElementById("quarter")?.value || "Q1";
+      return data.transmutation.locked[q] ? "🔒 FINALIZED" : "🟡 Draft";
+    }
+
+    function gradeRemark(grade) {
+      if (grade >= 90) return "Outstanding";
+      if (grade >= 85) return "Very Satisfactory";
+      if (grade >= 80) return "Satisfactory";
+      if (grade >= 75) return "Fairly Satisfactory";
+      return "Did Not Meet Expectations";
+    }
+
+    function getEmptyYear() {
+      return {
+        classes: {},
+        students: {},
+        attendance: {},
+        grades: {},
+        seating: {},
+        weights: { quiz: 30, exam: 40, project: 30 },
+        schoolInfo: { name: '', adviser: '', logo: '' },
+        lockedQuarters: {},
+        subjects: {},
+        transmutation: {
+          mode: 'deped',
+          locked: {},
+          customTable: []
+        }
+      };
+    }
+
+    let teachers = JSON.parse(localStorage.getItem("teachers")) || {};
+    let teacherName = '';
+    let activeClass = '';
+    let currentStudentId = null;
+    let store = JSON.parse(localStorage.getItem('teacherAIO')) || {};
+    let activeYear = localStorage.getItem('activeYear') || '';
+
+    function loginTeacher() {
+      let name = prompt("Teacher name:");
+      if (!name) return;
+
+      if (!teachers[name]) {
+        const pin = prompt("Set a 4-digit PIN:");
+        if (!/^\d{4}$/.test(pin)) {
+          alert("Invalid PIN");
+          return;
+        }
+        teachers[name] = { pin };
+        localStorage.setItem("teachers", JSON.stringify(teachers));
+      } else {
+        const pin = prompt("Enter PIN:");
+        if (pin !== teachers[name].pin) {
+          alert("Incorrect PIN");
+          return;
+        }
+      }
+
+      localStorage.setItem("teacherName", name);
+      localStorage.setItem("activeYear", activeYear);
+      localStorage.setItem("activeClass", "");
+      setTimeout(() => location.reload(), 100);
+    }
+
+    if (!activeYear) {
+      const year = new Date().getFullYear();
+      activeYear = `${year}-${year + 1}`;
+      store[activeYear] = getEmptyYear();
+      localStorage.setItem('activeYear', activeYear);
+      localStorage.setItem('teacherAIO', JSON.stringify(store));
+    }
+
+    let data = store[activeYear] || getEmptyYear();
+    data.lockedQuarters ??= {};
+    data.subjects ??= {};
+    data.transmutation ??= { mode: 'deped', locked: {}, customTable: [] };
+
+    Object.keys(data.classes).forEach(id => {
+      if (!data.classes[id].pin) data.classes[id].pin = '';
+      if (!data.classes[id].unlocked) data.classes[id].unlocked = false;
+    });
+
+    if (params.get("parent") === "1") {
+      document.body.classList.add("parent-view");
+      document.getElementById("parentBanner").style.display = "block";
+
+      const classId = params.get("class");
+      const studentId = params.get("student");
+      const qrQuarter = params.get("q");
+
+      if (!["Q1","Q2","Q3","Q4"].includes(qrQuarter)) {
+        document.body.innerText = "Record not found.";
+      } else {
+        if (!data.transmutation.locked[qrQuarter]) {
+          document.body.innerText = "This report is not finalized.";
+        } else {
+          window.addEventListener("load", () => {
+            if (!classId || !studentId) return;
+
+            let foundYear = null;
+            for (const y in store) {
+              if (store[y]?.classes?.[classId]) {
+                foundYear = y;
+                break;
+              }
+            }
+
+            if (!foundYear) {
+              document.body.innerText = "Record not found.";
+              return;
+            }
+
+            activeYear = foundYear;
+            data = store[foundYear];
+            activeClass = classId;
+
+            localStorage.setItem("activeYear", activeYear);
+            localStorage.setItem("activeClass", activeClass);
+
+            render();
+
+            setTimeout(() => {
+              if (data.students?.[classId]?.[studentId]) {
+                openStudentProfile(studentId);
+              } else {
+                document.body.innerText = "Record not found.";
+              }
+            }, 300);
+          });
+        }
+      }
+    }
+
+    const cachedRankings = {};
+
+    function save() {
+      if (!activeYear) return;
+      store[activeYear] = data;
+      localStorage.setItem('teacherAIO', JSON.stringify(store));
+    }
+
+    function isArchivedYear() {
+      const years = Object.keys(store);
+      if (years.length <= 1) return false;
+      const latest = years.sort()[years.length - 1];
+      return activeYear !== latest;
+    }
+
+    function isClassLocked() {
+      if (!activeClass || !data.classes[activeClass]) return false;
+      const c = data.classes[activeClass];
+      if (c.owner && c.owner !== teacherName) return true;
+      return c.pin && !c.unlocked;
+    }
+
+    function applyClassLock() {
+      const locked = isClassLocked();
+      document.body.classList.toggle("read-only", locked);
+      updateLockStatus();
+    }
+
+    function updateLockStatus() {
+      if (!activeClass) {
+        document.getElementById("lockStatus").classList.remove("locked", "unlocked");
+        document.getElementById("pinBox").classList.remove("show");
+        return;
+      }
+
+      const classData = data.classes[activeClass];
+      const hasPin = classData.pin;
+      const locked = isClassLocked();
+      const isOwner = !classData.owner || classData.owner === teacherName;
+
+      document.getElementById("pinBox").classList.toggle(
+        "show",
+        hasPin && isClassLocked() && isOwner
+      );
+
+      document.getElementById("setPinBtn").style.display =
+        isOwner ? "block" : "none";
+
+      if (locked) {
+        document.getElementById("lockStatus").textContent = "🔒 Locked";
+        document.getElementById("lockStatus").className = "lock-status locked";
+      } else {
+        document.getElementById("lockStatus").textContent = "🔓 Unlocked";
+        document.getElementById("lockStatus").className = "lock-status unlocked";
+      }
+    }
+
+    function updateEditability() {
+      const archived = isArchivedYear();
+      document.querySelectorAll('.editable').forEach(btn => {
+        btn.disabled = archived;
+      });
+      document.getElementById("yearBadge").classList.toggle("hidden", !archived);
+    }
+
+    function forceEnableBootstrapActions() {
+      if (!Object.keys(data.classes || {}).length) {
+        document.querySelectorAll('.editable').forEach(btn => {
+          btn.disabled = false;
+        });
+      }
+    }
+
+    function renderSchoolYears() {
+      const sel = document.getElementById("schoolYear");
+      const years = Object.keys(store).sort();
+      sel.innerHTML = years.map(y => {
+        const isCurrent = y === activeYear;
+        const isLatest = y === years[years.length - 1];
+        return `<option value="${y}" ${isCurrent ? 'selected' : ''}>${y}${!isLatest ? ' (Archived)' : ''}</option>`;
+      }).join("");
+    }
+
+    function addSchoolYear() {
+      const input = document.getElementById("newSchoolYear");
+      const start = parseInt(input.value);
+
+      if (!start || isNaN(start)) {
+        alert("Please enter a valid year");
+        return;
+      }
+
+      const sy = `${start}-${start + 1}`;
+
+      if (store[sy]) {
+        alert("School year already exists");
+        return;
+      }
+
+      store[sy] = getEmptyYear();
+      activeYear = sy;
+
+      localStorage.setItem("activeYear", activeYear);
+      data = store[activeYear];
+      save();
+
+      input.value = "";
+      renderSchoolYears();
+      render();
+    }
+
+    function avg(arr) {
+      if (!arr.length) return 0;
+      return arr.reduce((a,b)=>a + (b.score ?? b), 0) / arr.length;
+    }
+
+    function isAtRisk(studentId) {
+      const ga = Number(generalAverage(studentId));
+      const att = attendanceSummary(studentId);
+
+      if (!isNaN(ga) && ga < 75) return true;
+      if (att.absent >= 10) return true;
+
+      return false;
+    }
+
+    function computeWeightedGrade(quizArr, examArr, projectArr, weights) {
+      let total = 0;
+      let weightSum = 0;
+
+      if (quizArr.length) {
+        total += avg(quizArr) * weights.quiz;
+        weightSum += weights.quiz;
+      }
+
+      if (examArr.length) {
+        total += avg(examArr) * weights.exam;
+        weightSum += weights.exam;
+      }
+
+      if (projectArr.length) {
+        total += avg(projectArr) * weights.project;
+        weightSum += weights.project;
+      }
+
+      return weightSum ? total / weightSum : 0;
+    }
+
+    function addClass() {
+      if (isArchivedYear()) return;
+      const name = document.getElementById('classInput').value.trim();
+      if (!name) return;
+      const id = 'CLS' + Date.now();
+      data.classes[id] = { name, pin: '', unlocked: false, owner: teacherName };
+      data.students[id] = {};
+      data.attendance[id] = {};
+      data.grades[id] = {};
+      data.seating[id] = Array(20).fill(null);
+      data.subjects[id] = ["Math"];
+      activeClass = id;
+      localStorage.setItem('activeClass', id);
+      save();
+      document.getElementById('classInput').value = '';
+      render();
+    }
+
+    function selectClass(id) {
+      activeClass = id;
+      if (data.classes[id]) {
+        data.classes[id].unlocked = false;
+      }
+      localStorage.setItem('activeClass', id);
+      save();
+      applyClassLock();
+      render();
+    }
+
+    function getParentLink(studentId) {
+      const baseUrl = `${location.origin}${location.pathname}`;
+      const quarter = document.getElementById("quarter")?.value || "Q1";
+      return `${baseUrl}?parent=1&class=${activeClass}&student=${studentId}&q=${quarter}`;
+    }
+
+    function showParentShare(studentId) {
+      if (!studentId || !activeClass) return;
+
+      const student = data.students[activeClass]?.[studentId];
+      if (!student) return;
+
+      const shareLink = getParentLink(studentId);
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareLink)}`;
+
+      document.getElementById("shareUrl").textContent = shareLink;
+      document.getElementById("qrCode").src = qrUrl;
+      document.getElementById("parent-share-modal").classList.add("show");
+    }
+
+    function closeParentShare() {
+      document.getElementById("parent-share-modal").classList.remove("show");
+    }
+
+    function copyShareLink() {
+      const link = document.getElementById("shareUrl").textContent;
+      navigator.clipboard.writeText(link).then(() => {
+        alert("✅ Link copied to clipboard!");
+      }).catch(() => {
+        alert("❌ Failed to copy link");
+      });
+    }
+
+    function shareMessenger() {
+      const link = document.getElementById("shareUrl").textContent;
+      if (!link) return;
+      const url = "https://www.facebook.com/sharer/sharer.php?u=" +
+                  encodeURIComponent(link);
+      window.open(url, "_blank");
+    }
+
+    function shareSMS() {
+      const link = document.getElementById("shareUrl").textContent;
+      if (!link) return;
+      const message = `Good day! Here is your child's school report:\n${link}`;
+      window.location.href = "sms:?body=" + encodeURIComponent(message);
+    }
+
+    function toggleParentView(enabled) {
+      if (!params.get("parent")) {
+        if (enabled) {
+          document.body.classList.add("parent-view");
+        } else {
+          document.body.classList.remove("parent-view");
+          applyClassLock();
+        }
+      }
+    }
+
+    function addStudent() {
+      if (isArchivedYear()) return;
+      if (!activeClass) {
+        alert("Please select a class first before adding students.");
+        return;
+      }
+      const name = document.getElementById('studentInput').value.trim();
+      if (!name) return;
+
+      data.students[activeClass]['STU' + Date.now()] = {
+        name,
+        studentId: "",
+        guardian: "",
+        mobile: "",
+        birthdate: "",
+        behaviorNotes: [],
+        photo: null,
+        transferHistory: [],
+        status: "active"
+      };
+
+      save();
+      document.getElementById('studentInput').value = '';
+      render();
+    }
+
+    function dropStudent() {
+      if (!activeClass || !currentStudentId) return;
+      if (!confirm("Mark this student as DROPPED?")) return;
+
+      data.students[activeClass][currentStudentId].status = "dropped";
+      save();
+      closeStudentProfile();
+      renderStudents();
+    }
+
+    function transferStudent() {
+      if (isArchivedYear()) {
+        alert("Cannot transfer students in archived school years.");
+        return;
+      }
+
+      if (!activeClass || !currentStudentId) return;
+
+      if (isClassLocked()) {
+        alert("Class is locked. Unlock first.");
+        return;
+      }
+
+      const targetClass = prompt("Enter TARGET CLASS NAME (exact name):");
+
+      if (!targetClass) return;
+
+      const targetId = Object.keys(data.classes).find(
+        id => data.classes[id].name === targetClass
+      );
+
+      if (!targetId) {
+        alert("Target class not found.");
+        return;
+      }
+
+      if (targetId === activeClass) {
+        alert("Student is already in this class.");
+        return;
+      }
+
+      const student = data.students[activeClass][currentStudentId];
+
+      student.transferHistory ??= [];
+      student.transferHistory.push({
+        from: data.classes[activeClass].name,
+        to: data.classes[targetId].name,
+        date: new Date().toISOString().slice(0, 10)
+      });
+
+      data.students[targetId] ??= {};
+      data.students[targetId][currentStudentId] = student;
+      delete data.students[activeClass][currentStudentId];
+
+      data.grades[targetId] ??= {};
+      data.grades[targetId][currentStudentId] =
+        data.grades[activeClass]?.[currentStudentId] || {};
+      delete data.grades[activeClass]?.[currentStudentId];
+
+      Object.entries(data.attendance[activeClass] || {}).forEach(([date, day]) => {
+        if (day[currentStudentId]) {
+          data.attendance[targetId] ??= {};
+          data.attendance[targetId][date] ??= {};
+          data.attendance[targetId][date][currentStudentId] = day[currentStudentId];
+          delete day[currentStudentId];
+        }
+      });
+
+      save();
+      closeStudentProfile();
+      render();
+
+      alert("✅ Student transferred successfully.");
+    }
+
+    function markAll(status) {
+      if (isArchivedYear()) return;
+      if (!activeClass) return;
+      const date = document.getElementById('attendanceDate').value;
+      if (!date) return;
+      data.attendance[activeClass][date] ??= {};
+      Object.keys(data.students[activeClass]).forEach(id => {
+        data.attendance[activeClass][date][id] = status;
+      });
+      save();
+      renderAttendance();
+    }
+
+    function setAttendance(sid, status) {
+      if (isArchivedYear()) return;
+      if (!activeClass) return;
+      const date = document.getElementById('attendanceDate').value;
+      data.attendance[activeClass][date] ??= {};
+      data.attendance[activeClass][date][sid] = status;
+      save();
+    }
+
+    function saveWeights() {
+      if (isArchivedYear()) return;
+      data.weights = {
+        quiz: Number(document.getElementById('wQuiz').value),
+        exam: Number(document.getElementById('wExam').value),
+        project: Number(document.getElementById('wProject').value)
+      };
+      save();
+      renderGrades();
+    }
+
+    function addScore(sid, type, value) {
+      if (isArchivedYear()) return;
+      if (!activeClass) return;
+
+      const subject = document.getElementById('subject').value;
+      const quarter = document.getElementById('quarter').value;
+
+      let score = 0;
+
+      if (String(value).includes('/')) {
+        const [s, t] = value.split('/').map(Number);
+        if (!t || s > t) return;
+        score = (s / t) * 100;
+      } else {
+        score = Number(value);
+      }
+
+      if (isNaN(score) || score < 0 || score > 100) return;
+
+      data.grades[activeClass][sid] ??= {};
+      data.grades[activeClass][sid][subject] ??= {};
+      data.grades[activeClass][sid][subject][quarter] ??= {
+        quiz: [],
+        exam: [],
+        project: []
+      };
+
+      data.grades[activeClass][sid][subject][quarter][type].push({
+        title: type.toUpperCase(),
+        score: score,
+        date: new Date().toISOString().slice(0,10)
+      });
+
+      save();
+      renderGrades();
+    }
+
+    function deleteScore(sid, quarter, type, index) {
+      if (isArchivedYear()) return;
+      const subject = document.getElementById('subject').value;
+      if (!activeClass) return;
+      data.grades[activeClass][sid]?.[subject]?.[quarter]?.[type]?.splice(index, 1);
+      save();
+      renderGrades();
+      openStudentProfile(sid);
+    }
+
+    function addSubject() {
+      if (isArchivedYear()) return;
+      if (!activeClass) return;
+      const val = document.getElementById("newSubject").value.trim();
+      if (!val) return;
+
+      data.subjects[activeClass] ??= [];
+      if (!data.subjects[activeClass].includes(val)) {
+        data.subjects[activeClass].push(val);
+      }
+
+      document.getElementById("newSubject").value = "";
+      save();
+      renderSubjects();
+      renderGrades();
+    }
+
+    function computeRanking(quarter, subject) {
+      if (!activeClass) return [];
+
+      const w = data.weights;
+      const cacheKey = `${activeClass}-${quarter}-${subject}-${w.quiz}-${w.exam}-${w.project}`;
+
+      if (data.transmutation.locked[quarter] && cachedRankings[cacheKey]) {
+        return cachedRankings[cacheKey];
+      }
+
+      const ranking = Object.entries(data.students[activeClass])
+        .map(([sid]) => {
+          const g = data.grades[activeClass]?.[sid]?.[subject]?.[quarter] || { quiz: [], exam: [], project: [] };
+          const hasScores = g.quiz.length || g.exam.length || g.project.length;
+          if (!hasScores) return null;
+          const raw = computeWeightedGrade(g.quiz, g.exam, g.project, w);
+          return { sid, final: transmuteGrade(raw) };
+        })
+        .filter(row => row !== null)
+        .sort((a, b) => b.final - a.final)
+        .map((x, i) => ({ ...x, rank: i + 1 }));
+
+      if (data.transmutation.locked[quarter]) {
+        cachedRankings[cacheKey] = ranking;
+      }
+
+      return ranking;
+    }
+
+    function generalAverage(sid) {
+      if (!activeClass) return '-';
+      let total = 0, count = 0;
+      const w = data.weights;
+      const subjects = data.subjects[activeClass] || ["Math"];
+      
+      subjects.forEach(subj => {
+        ['Q1', 'Q2', 'Q3', 'Q4'].forEach(q => {
+          const g = data.grades[activeClass]?.[sid]?.[subj]?.[q];
+          if (g && (g.quiz.length > 0 || g.exam.length > 0 || g.project.length > 0)) {
+            const raw = computeWeightedGrade(g.quiz, g.exam, g.project, w);
+            total += transmuteGrade(raw);
+            count++;
+          }
+        });
+      });
+      
+      return count ? (total / count).toFixed(1) : '-';
+    }
+
+    function generateAutoRemarks(studentId) {
+      if (!activeClass) return "No data available.";
+
+      const subjects = data.subjects[activeClass] || [];
+      let quizAvg = [];
+      let examAvg = [];
+      let projectAvg = [];
+
+      subjects.forEach(subj => {
+        ['Q1','Q2','Q3','Q4'].forEach(q => {
+          const g = data.grades[activeClass]?.[studentId]?.[subj]?.[q];
+          if (!g) return;
+
+          if (g.quiz.length) quizAvg.push(avg(g.quiz));
+          if (g.exam.length) examAvg.push(avg(g.exam));
+          if (g.project.length) projectAvg.push(avg(g.project));
+        });
+      });
+
+      const remarks = [];
+
+      const q = avg(quizAvg);
+      const e = avg(examAvg);
+      const p = avg(projectAvg);
+
+      if (quizAvg.length)
+        remarks.push(
+          q >= 85
+            ? "Consistently performs well in quizzes."
+            : q >= 75
+            ? "Shows acceptable performance in quizzes."
+            : "Needs improvement in quizzes."
+        );
+
+      if (examAvg.length)
+        remarks.push(
+          e >= 85
+            ? "Demonstrates strong understanding during examinations."
+            : e >= 75
+            ? "Shows fair performance in examinations."
+            : "Needs improvement in examinations."
+        );
+
+      if (projectAvg.length)
+        remarks.push(
+          p >= 85
+            ? "Displays commendable effort and creativity in projects."
+            : p >= 75
+            ? "Shows satisfactory performance in projects."
+            : "Needs improvement in project outputs."
+        );
+
+      const ga = Number(generalAverage(studentId));
+      if (!isNaN(ga)) {
+        if (ga >= 90) remarks.push("Overall performance is outstanding.");
+        else if (ga >= 75) remarks.push("Overall performance is satisfactory.");
+        else remarks.push("Overall performance requires intervention.");
+      }
+
+      return remarks.join(" ");
+    }
+
+    function promotionStatus(sid) {
+      const ga = Number(generalAverage(sid));
+      if (isNaN(ga)) return '-';
+      if (ga >= 75) return 'PROMOTED';
+      if (ga >= 70) return 'CONDITIONAL';
+      return 'RETAINED';
+    }
+
+    function attendanceSummary(studentId) {
+      let present = 0, absent = 0, late = 0;
+      Object.values(data.attendance[activeClass] || {}).forEach(day => {
+        const status = day[studentId];
+        if (status === "present") present++;
+        if (status === "absent") absent++;
+        if (status === "late") late++;
+      });
+      return { present, absent, late };
+    }
+
+    function saveSchoolInfo() {
+      if (isArchivedYear()) return;
+      data.schoolInfo.name = document.getElementById('schoolName').value;
+      data.schoolInfo.adviser = document.getElementById('adviser').value;
+      const logoInput = document.getElementById('logo');
+      if (logoInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          data.schoolInfo.logo = reader.result;
+          save();
+        };
+        reader.readAsDataURL(logoInput.files[0]);
+      } else {
+        save();
+      }
+    }
+
+    function saveStudentInfo() {
+      if (isArchivedYear()) return;
+      if (!activeClass || !currentStudentId) return;
+
+      const s = data.students[activeClass][currentStudentId];
+
+      s.name = document.getElementById("sp-name-edit").value.trim() || s.name;
+      s.studentId = document.getElementById("sp-studentId").value;
+      s.birthdate = document.getElementById("sp-birthdate").value;
+      s.guardian = document.getElementById("sp-guardian").value;
+      s.mobile = document.getElementById("sp-mobile").value;
+
+      save();
+      renderStudents();
+      renderGrades();
+      renderSF9();
+    }
+
+    function randomizeSeating() {
+      if (isArchivedYear()) return;
+      if (!activeClass) return;
+      const ids = Object.keys(data.students[activeClass]);
+      data.seating[activeClass] = [...ids].sort(() => Math.random() - 0.5).concat(Array(20).fill(null)).slice(0, 20);
+      save();
+      renderSeating();
+    }
+
+    let draggedId = null;
+
+    function renderNav() {
+      const nav = document.getElementById('nav');
+      const sections = {};
+      
+      views.forEach(v => {
+        if (!sections[v.section]) {
+          sections[v.section] = [];
+        }
+        sections[v.section].push(v);
+      });
+
+      let html = '';
+      Object.entries(sections).forEach(([section, items]) => {
+        html += `<div class="nav-section">
+          <span class="nav-section-title">${section}</span>
+          ${items.map((v, idx) => `
+            <button type="button" class="nav-btn ${v.id === 'dashboard' ? 'active' : ''}" data-section="${v.id}" data-nav-index="${idx}">
+              ${v.label}
+            </button>
+          `).join('')}
+        </div>`;
+      });
+
+      nav.innerHTML = html;
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const sectionId = this.dataset.section;
+          viewSection(sectionId, this);
+        });
+      });
+    }
+
+    function renderGlobalClass() {
+      const sel = document.getElementById('globalClass');
+      sel.innerHTML = '<option value="">Select Class</option>' + 
+        Object.entries(data.classes).map(([id, c]) => `
+          <option value="${id}" ${id === activeClass ? 'selected' : ''}>${c.name}</option>
+        `).join('');
+    }
+
+    function renderClasses() {
+      const list = document.getElementById('classList');
+      list.innerHTML = Object.entries(data.classes).map(([id, c]) => `
+        <li class="student-item cursor-pointer hover:bg-blue-50" data-class-id="${id}">
+          <span>${c.name}${c.pin ? ' 🔐' : ''}</span>
+          <span class="text-gray-400">·</span>
+        </li>
+      `).join('');
+      document.getElementById('classCount').textContent = Object.keys(data.classes).length;
+
+      list.querySelectorAll('[data-class-id]').forEach(item => {
+        item.addEventListener('click', function() {
+          selectClass(this.dataset.classId);
+        });
+      });
+    }
+
+    function renderStudents() {
+      const list = document.getElementById('studentList');
+      if (!activeClass) {
+        list.innerHTML = '';
+        document.getElementById('studentCount').textContent = '0';
+        return;
+      }
+      const students = Object.entries(data.students[activeClass] || {})
+        .filter(([_, s]) => s.status !== "dropped");
+      
+      list.innerHTML = students.map(([id, s]) => `
+        <li class="student-item cursor-pointer hover:bg-indigo-50" data-student-id="${id}">
+          <span>${s.name}</span>
+          ${isAtRisk(id)
+            ? '<span class="badge badge-retained">⚠️ At Risk</span>'
+            : '<span class="badge badge-active">View</span>'}
+        </li>
+      `).join('');
+      document.getElementById('studentCount').textContent = students.length;
+
+      list.querySelectorAll('[data-student-id]').forEach(item => {
+        item.addEventListener('click', function() {
+          openStudentProfile(this.dataset.studentId);
+        });
+      });
+    }
+
+    function renderSubjects() {
+      const sel = document.getElementById('subject');
+      if (!activeClass) {
+        sel.innerHTML = '';
+        return;
+      }
+
+      data.subjects[activeClass] ??= ["Math"];
+
+      sel.innerHTML = data.subjects[activeClass]
+        .map(s => `<option value="${s}">${s}</option>`)
+        .join('');
+    }
+
+    function renderAttendance() {
+      const tbody = document.getElementById('attendanceTable');
+      if (!activeClass) {
+        tbody.innerHTML = '';
+        return;
+      }
+
+      const students = Object.entries(data.students[activeClass] || {})
+        .filter(([_, s]) => s.status !== "dropped");
+      const date = document.getElementById('attendanceDate').value;
+      const dayAttendance = data.attendance[activeClass]?.[date] || {};
+
+      tbody.innerHTML = students.map(([id, s]) => {
+        const status = dayAttendance[id] || '';
+        return `
+          <tr>
+            <td>${s.name}</td>
+            <td style="text-align: center;"><input type="radio" name="att-${id}" value="present" ${status === 'present' ? 'checked' : ''} data-att="${id}" data-status="present"></td>
+            <td style="text-align: center;"><input type="radio" name="att-${id}" value="absent" ${status === 'absent' ? 'checked' : ''} data-att="${id}" data-status="absent"></td>
+            <td style="text-align: center;"><input type="radio" name="att-${id}" value="late" ${status === 'late' ? 'checked' : ''} data-att="${id}" data-status="late"></td>
+          </tr>
+        `;
+      }).join('');
+
+      tbody.querySelectorAll('input[data-att]').forEach(input => {
+        input.addEventListener('change', function () {
+          setAttendance(this.dataset.att, this.dataset.status);
+        });
+      });
+    }
+
+    function renderGrades() {
+      const tbody = document.getElementById('gradesTable');
+      if (!activeClass) {
+        tbody.innerHTML = '';
+        return;
+      }
+
+      const students = Object.entries(data.students[activeClass] || {})
+        .filter(([_, s]) => s.status !== "dropped");
+      const subject = document.getElementById('subject').value;
+      const quarter = document.getElementById('quarter').value;
+      const w = data.weights;
+
+      tbody.innerHTML = students.map(([id, s]) => {
+        const g = data.grades[activeClass]?.[id]?.[subject]?.[quarter] || { quiz: [], exam: [], project: [] };
+
+        const hasScores = g.quiz.length > 0 || g.exam.length > 0 || g.project.length > 0;
+        if (!hasScores) {
+          return `
+            <tr>
+              <td>${s.name}</td>
+              <td colspan="5" style="text-align:center;color:#9ca3af;">
+                No grades yet
+              </td>
+            </tr>
+          `;
+        }
+
+        const raw = computeWeightedGrade(g.quiz, g.exam, g.project, w);
+        const final = transmuteGrade(raw);
+        const ranking = computeRanking(quarter, subject);
+        const rank = ranking.find(r => r.sid === id)?.rank || '-';
+
+        return `
+          <tr>
+            <td><a href="#" class="student-link" data-student-id="${id}" style="color: #3b82f6; cursor: pointer;">${s.name}</a></td>
+            <td style="text-align: center;"><span style="background: #f0f4ff; padding: 4px 8px; border-radius: 4px;">${avg(g.quiz).toFixed(1)}</span></td>
+            <td style="text-align: center;"><span style="background: #f0f4ff; padding: 4px 8px; border-radius: 4px;">${avg(g.exam).toFixed(1)}</span></td>
+            <td style="text-align: center;"><span style="background: #f0f4ff; padding: 4px 8px; border-radius: 4px;">${avg(g.project).toFixed(1)}</span></td>
+            <td style="text-align: center;"><strong style="font-size: 14px; color: #667eea;">${final}</strong></td>
+            <td style="text-align: center;"><strong style="font-size: 14px;">${rank}</strong></td>
+          </tr>
+        `;
+      }).filter(Boolean).join('');
+
+      const mode = data.transmutation.mode || 'deped';
+      document
+        .querySelector(`input[name="transMode"][value="${mode}"]`)
+        ?.setAttribute("checked", "checked");
+
+      document.querySelectorAll('.student-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          openStudentProfile(this.dataset.studentId);
+        });
+      });
+    }
+
+    function addBehaviorNote() {
+      if (isArchivedYear()) return;
+      const note = document.getElementById("behavior-note").value.trim();
+      if (!note) return;
+      if (!data.students[activeClass][currentStudentId].behaviorNotes) {
+        data.students[activeClass][currentStudentId].behaviorNotes = [];
+      }
+      data.students[activeClass][currentStudentId].behaviorNotes.push({
+        text: note,
+        date: new Date().toLocaleDateString()
+      });
+      document.getElementById("behavior-note").value = "";
+      save();
+      renderBehaviorNotes();
+    }
+
+    function renderBehaviorNotes() {
+      const notes = data.students[activeClass][currentStudentId]?.behaviorNotes || [];
+      document.getElementById("behavior-list").innerHTML = notes.map(n => `
+        <li class="border rounded p-2 text-sm bg-gray-50">
+          <b>${n.date}</b><br>${n.text}
+        </li>
+      `).join("");
+    }
+
+    function uploadStudentPhoto(input) {
+      if (isArchivedYear()) return;
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        data.students[activeClass][currentStudentId].photo = reader.result;
+        document.getElementById("student-photo").src = reader.result;
+        save();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function openStudentProfile(studentId) {
+      document.getElementById("parent-toggle").checked = false;
+      if (!params.get("parent")) {
+        toggleParentView(false);
+      }
+
+      if (!activeClass) return;
+      currentStudentId = studentId;
+
+      const student = data.students[activeClass][studentId];
+      const className = data.classes[activeClass]?.name || "";
+      const subjects = data.subjects[activeClass] || ["Math"];
+
+      document.getElementById("sp-name").textContent = student.name;
+      document.getElementById("sp-name-edit").value = student.name;
+      document.getElementById("sp-class").textContent = className;
+
+      document.getElementById("sp-studentId").value = student.studentId || "";
+      document.getElementById("sp-birthdate").value = student.birthdate || "";
+      document.getElementById("sp-guardian").value = student.guardian || "";
+      document.getElementById("sp-mobile").value = student.mobile || "";
+
+      document.getElementById("pv-id").textContent = student.studentId || "—";
+      document.getElementById("pv-birthdate").textContent = student.birthdate || "—";
+      document.getElementById("pv-guardian").textContent = student.guardian || "—";
+      document.getElementById("pv-mobile").textContent = student.mobile || "—";
+
+      let total = 0, count = 0;
+      let gradeRows = "";
+      let gradeDetails = "";
+
+      subjects.forEach(subj => {
+        ['Q1', 'Q2', 'Q3', 'Q4'].forEach(q => {
+          const g = data.grades[activeClass]?.[studentId]?.[subj]?.[q];
+          if (!g) return;
+
+          const hasScores = g.quiz.length > 0 || g.exam.length > 0 || g.project.length > 0;
+          if (!hasScores) return;
+
+          const raw = computeWeightedGrade(g.quiz, g.exam, g.project, data.weights);
+          const final = transmuteGrade(raw);
+          const remark = gradeRemark(final);
+          const ranking = computeRanking(q, subj);
+          const rank = ranking.find(r => r.sid === studentId)?.rank || "-";
+
+          total += final;
+          count++;
+
+          gradeRows += `
+            <tr>
+              <td class="p-2 border">${subj} - ${q}</td>
+              <td class="p-2 border text-center">${final}</td>
+              <td class="p-2 border text-center">${rank}</td>
+              <td class="p-2 border text-center">${remark}</td>
+            </tr>
+          `;
+
+          gradeDetails += `
+            <div class="card p-4">
+              <h4 class="font-semibold text-indigo-600 mb-3">${subj} - ${q} Assessments</h4>
+              <div class="space-y-2 text-sm">
+                ${g.quiz.length > 0 ? `<div><b>Quiz</b><ul class="ml-4 mt-1">${g.quiz.map((qu, i) => `<li class="flex justify-between items-center">
+                  ${qu.title} – ${qu.score.toFixed(1)}
+                  <button class="text-red-500 text-xs delete-score-btn" data-sid="${studentId}" data-q="${q}" data-type="quiz" data-idx="${i}">✕</button>
+                </li>`).join("")}</ul></div>` : ""}
+                ${g.exam.length > 0 ? `<div><b>Exam</b><ul class="ml-4 mt-1">${g.exam.map((e, i) => `<li class="flex justify-between items-center">
+                  ${e.title} – ${e.score.toFixed(1)}
+                  <button class="text-red-500 text-xs delete-score-btn" data-sid="${studentId}" data-q="${q}" data-type="exam" data-idx="${i}">✕</button>
+                </li>`).join("")}</ul></div>` : ""}
+                ${g.project.length > 0 ? `<div><b>Project</b><ul class="ml-4 mt-1">${g.project.map((p, i) => `<li class="flex justify-between items-center">
+                  ${p.title} – ${p.score.toFixed(1)}
+                  <button class="text-red-500 text-xs delete-score-btn" data-sid="${studentId}" data-q="${q}" data-type="project" data-idx="${i}">✕</button>
+                </li>`).join("")}</ul></div>` : ""}
+              </div>
+            </div>
+          `;
+        });
+      });
+
+      const genAve = count ? (total / count).toFixed(1) : "-";
+      const status = promotionStatus(studentId);
+      const att = attendanceSummary(studentId);
+
+      document.getElementById("sp-average").textContent = genAve;
+      document.getElementById("sp-status").textContent = status + (isAtRisk(studentId) ? " ⚠️" : "");
+      document.getElementById("sp-rank").textContent = "—";
+      document.getElementById("att-present").textContent = att.present;
+      document.getElementById("att-absent").textContent = att.absent;
+      document.getElementById("att-late").textContent = att.late;
+      document.getElementById("sp-grades").innerHTML = gradeRows || '<tr><td colspan="4" style="text-align: center; padding: 16px;">No grades recorded yet</td></tr>';
+      document.getElementById("grade-details").innerHTML = gradeDetails || '<p class="text-gray-500 text-sm">No assessment details yet</p>';
+
+      if (student.photo) {
+        document.getElementById("student-photo").src = student.photo;
+      } else {
+        document.getElementById("student-photo").src = "";
+      }
+
+      renderBehaviorNotes();
+      document.getElementById("auto-remarks").textContent = generateAutoRemarks(studentId);
+      
+      const history = student.transferHistory || [];
+      document.getElementById("transfer-history").innerHTML =
+        history.length
+          ? history.map(h =>
+              `<li>${h.date}: ${h.from} → ${h.to}</li>`
+            ).join("")
+          : "<li>No transfers recorded.</li>";
+
+      document.getElementById("student-modal").classList.remove("hidden");
+
+      document.querySelectorAll('.delete-score-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const sid = this.dataset.sid;
+          const q = this.dataset.q;
+          const type = this.dataset.type;
+          const idx = parseInt(this.dataset.idx);
+          deleteScore(sid, q, type, idx);
+        });
+      });
+    }
+
+    function closeStudentProfile() {
+      document.getElementById("student-modal").classList.add("hidden");
+      currentStudentId = null;
+    }
+
+    async function exportStudentPDF(studentId) {
+      if (!studentId || !activeClass) return;
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFont("helvetica", "normal");
+
+      const s = data.students[activeClass][studentId];
+      const c = data.classes[activeClass].name;
+
+      doc.setFontSize(14);
+      doc.text("STUDENT PERFORMANCE REPORT", 20, 20);
+
+      doc.setFontSize(11);
+      doc.text(`Name: ${s.name}`, 20, 35);
+      doc.text(`Class: ${c}`, 20, 42);
+
+      let y = 55;
+
+      const subjects = data.subjects[activeClass] || ["Math"];
+      subjects.forEach(subj => {
+        ['Q1', 'Q2', 'Q3', 'Q4'].forEach(q => {
+          const g = data.grades[activeClass]?.[studentId]?.[subj]?.[q];
+          if (!g) return;
+
+          const hasScores = g.quiz.length > 0 || g.exam.length > 0 || g.project.length > 0;
+          if (!hasScores) return;
+
+          const final = transmuteGrade(
+            computeWeightedGrade(g.quiz, g.exam, g.project, data.weights)
+          );
+
+          doc.text(`${subj} - ${q}: ${final} (${gradeRemark(final)})`, 20, y);
+          y += 8;
+        });
+      });
+
+      doc.text(`General Average: ${generalAverage(studentId)}`, 20, y + 10);
+      doc.text(`Status: ${promotionStatus(studentId)}`, 20, y + 18);
+
+      doc.save(`${s.name}-report.pdf`);
+    }
+
+    async function exportSF9PDF() {
+      const sid = document.getElementById('sf9Student').value;
+      if (!sid || !activeClass) return;
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFont("helvetica", "normal");
+
+      const s = data.students[activeClass][sid];
+      const c = data.classes[activeClass].name;
+      const ga = generalAverage(sid);
+      const status = promotionStatus(sid);
+      const w = data.weights;
+      const subjects = data.subjects[activeClass] || ["Math"];
+
+      // Header
+      doc.setFontSize(16);
+      doc.text("SF9 REPORT CARD", 20, 20);
+
+      doc.setFontSize(11);
+      doc.text(`Name: ${s.name}`, 20, 35);
+      doc.text(`Class: ${c}`, 20, 42);
+      doc.text(`School: ${data.schoolInfo.name}`, 20, 49);
+      doc.text(`Year: ${activeYear}`, 20, 56);
+      doc.text(`Adviser: ${data.schoolInfo.adviser}`, 20, 63);
+
+      // Grades table
+      let y = 75;
+      doc.setFontSize(10);
+      doc.text("Subject", 20, y);
+      doc.text("Q", 60, y);
+      doc.text("Grade", 75, y);
+      doc.text("Rank", 100, y);
+      doc.text("Remarks", 125, y);
+
+      y += 8;
+
+      subjects.forEach(subj => {
+        ['Q1', 'Q2', 'Q3', 'Q4'].forEach(q => {
+          if (y > 270) {
+            doc.addPage();
+            y = 20;
+          }
+
+          const g = data.grades[activeClass]?.[sid]?.[subj]?.[q] || { quiz: [], exam: [], project: [] };
+          const hasScores = g.quiz.length > 0 || g.exam.length > 0 || g.project.length > 0;
+          if (!hasScores) return;
+
+          const raw = computeWeightedGrade(g.quiz, g.exam, g.project, w);
+          const transmuted = transmuteGrade(raw);
+          const ranking = computeRanking(q, subj);
+          const rank = ranking.find(r => r.sid === sid)?.rank || '-';
+          const remark = gradeRemark(transmuted);
+
+          doc.text(subj, 20, y);
+          doc.text(q, 60, y);
+          doc.text(String(transmuted), 75, y);
+          doc.text(String(rank), 100, y);
+          doc.text(remark, 125, y);
+
+          y += 8;
+        });
+      });
+
+      // Summary
+      y += 10;
+      if (y > 270) {
+        doc.addPage();
+        y = 20;
+      }
+
+      doc.setFontSize(11);
+      doc.text(`General Average: ${ga}`, 20, y);
+      doc.text(`Status: ${status}`, 20, y + 8);
+      doc.text(`Transmutation Mode: ${data.transmutation.locked[document.getElementById('quarter').value] ? 'FINALIZED' : 'Draft'}`, 20, y + 16);
+
+      doc.save(`SF9-${s.name}-${activeYear}.pdf`);
+    }
+
+    function exportForm137PDF() {
+      const sid = document.getElementById('sf9Student')?.value || currentStudentId;
+      if (!sid || !activeClass) {
+        alert("Please select a student.");
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF("p", "mm", "a4");
+
+      const s = data.students[activeClass][sid];
+      const className = data.classes[activeClass].name;
+      const school = data.schoolInfo.name || "";
+      const adviser = data.schoolInfo.adviser || "";
+      const subjects = data.subjects[activeClass] || ["Math"];
+
+      let y = 15;
+
+      /* ===== HEADER ===== */
+      doc.setFontSize(14);
+      doc.text("FORM 137 – PERMANENT ACADEMIC RECORD", 105, y, { align: "center" });
+      y += 8;
+
+      doc.setFontSize(10);
+      doc.text(`School: ${school}`, 15, y); y += 5;
+      doc.text(`Class: ${className}`, 15, y); y += 5;
+      doc.text(`School Year: ${activeYear}`, 15, y); y += 8;
+
+      /* ===== LEARNER INFO ===== */
+      doc.setFontSize(11);
+      doc.text("LEARNER INFORMATION", 15, y); y += 5;
+      doc.setFontSize(10);
+      doc.text(`Name: ${s.name}`, 15, y); y += 5;
+      doc.text(`Student ID: ${s.studentId || "-"}`, 15, y); y += 5;
+      doc.text(`Birthdate: ${s.birthdate || "-"}`, 15, y); y += 5;
+      doc.text(`Parent/Guardian: ${s.guardian || "-"}`, 15, y); y += 8;
+
+      /* ===== TABLE HEADER ===== */
+      doc.setFontSize(10);
+      doc.text("Subject", 15, y);
+      doc.text("Q1", 70, y);
+      doc.text("Q2", 85, y);
+      doc.text("Q3", 100, y);
+      doc.text("Q4", 115, y);
+      doc.text("Final", 135, y);
+      doc.text("Remarks", 160, y);
+      y += 3;
+      doc.line(15, y, 195, y);
+      y += 5;
+
+      let total = 0, count = 0;
+
+      subjects.forEach(subj => {
+        let finals = [];
+        ['Q1','Q2','Q3','Q4'].forEach(q => {
+          const g = data.grades[activeClass]?.[sid]?.[subj]?.[q];
+          if (g && (g.quiz.length || g.exam.length || g.project.length)) {
+            const raw = computeWeightedGrade(g.quiz, g.exam, g.project, data.weights);
+            finals.push(transmuteGrade(raw));
+          } else {
+            finals.push("-");
+          }
+        });
+
+        const valid = finals.filter(v => typeof v === "number");
+        const finalAve = valid.length ? (valid.reduce((a,b)=>a+b,0)/valid.length).toFixed(0) : "-";
+        const remark = finalAve >= 75 ? "PASSED" : "FAILED";
+
+        if (typeof finalAve === "string" && finalAve !== "-") {
+          total += Number(finalAve);
+          count++;
+        }
+
+        doc.text(subj, 15, y);
+        doc.text(String(finals[0]), 70, y);
+        doc.text(String(finals[1]), 85, y);
+        doc.text(String(finals[2]), 100, y);
+        doc.text(String(finals[3]), 115, y);
+        doc.text(String(finalAve), 135, y);
+        doc.text(remark, 160, y);
+
+        y += 6;
+        if (y > 260) {
+          doc.addPage();
+          y = 20;
+        }
+      });
+
+      /* ===== SUMMARY ===== */
+      y += 6;
+      const genAve = count ? (total / count).toFixed(1) : "-";
+      const status = promotionStatus(sid);
+
+      doc.setFontSize(11);
+      doc.text(`General Average: ${genAve}`, 15, y); y += 6;
+      doc.text(`Promotion Status: ${status}`, 15, y); y += 10;
+
+      /* ===== CERTIFICATION ===== */
+      doc.setFontSize(10);
+      doc.text("Certified Correct:", 15, y); y += 10;
+      doc.text(adviser, 15, y);
+      doc.text("Class Adviser", 15, y + 5);
+
+      doc.text(`Date Issued: ${new Date().toLocaleDateString()}`, 130, y);
+
+      doc.save(`Form137-${s.name}-${activeYear}.pdf`);
+    }
+
+    function renderSF9() {
+      const sid = document.getElementById('sf9Student').value;
+      const content = document.getElementById('sf9Content');
+      if (!sid || !activeClass) {
+        content.innerHTML = '';
+        document.getElementById("btnShareParent").style.display = "none";
+        return;
+      }
+
+      const s = data.students[activeClass][sid];
+      const c = data.classes[activeClass].name;
+      const ga = generalAverage(sid);
+      const status = promotionStatus(sid);
+      const w = data.weights;
+      const subjects = data.subjects[activeClass] || ["Math"];
+
+      let rows = '';
+      subjects.forEach(subj => {
+        ['Q1', 'Q2', 'Q3', 'Q4'].forEach(q => {
+          const g = data.grades[activeClass]?.[sid]?.[subj]?.[q] || { quiz: [], exam: [], project: [] };
+          const hasScores = g.quiz.length > 0 || g.exam.length > 0 || g.project.length > 0;
+          if (!hasScores) return;
+
+          const raw = computeWeightedGrade(g.quiz, g.exam, g.project, w);
+          const transmuted = transmuteGrade(raw);
+          const ranking = computeRanking(q, subj);
+          const rank = ranking.find(r => r.sid === sid)?.rank || '-';
+          rows += `
+            <tr>
+              <td>${subj}</td>
+              <td>${q}</td>
+              <td style="text-align: center;">${transmuted}</td>
+              <td style="text-align: center;">${rank}</td>
+              <td>${gradeRemark(transmuted)}</td>
+            </tr>
+          `;
+        });
+      });
+
+      content.innerHTML = `
+        <div class="mb-6">
+          <p><strong>Name:</strong> ${s.name}</p>
+          <p><strong>Class:</strong> ${c}</p>
+          <p><strong>School:</strong> ${data.schoolInfo.name}</p>
+          <p><strong>Year:</strong> ${activeYear}</p>
+        </div>
+        <div class="space-y-2 mb-4">
+          <div class="badge badge-active">Grading System: DepEd Transmutation</div>
+          <div class="badge badge-retained">${transmutationStatusBadge()}</div>
+        </div>
+        <table class="mb-6">
+          <thead><tr><th>Subject</th><th>Quarter</th><th>Grade</th><th>Rank</th><th>Remarks</th></tr></thead>
+          <tbody>${rows || '<tr><td colspan="5" style="text-align: center; padding: 16px;">No grades recorded</td></tr>'}</tbody>
+        </table>
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 16px;">
+          <p><strong>General Average:</strong> ${ga}</p>
+          <p><strong>Status:</strong> <span class="badge badge-${status.toLowerCase()}">${status}</span></p>
+          <p><strong>Adviser:</strong> ${data.schoolInfo.adviser}</p>
+        </div>
+      `;
+
+      document.getElementById("btnShareParent").style.display = sid ? "inline-block" : "none";
+    }
+
+    function populateSF9() {
+      const sel = document.getElementById('sf9Student');
+      if (!activeClass) {
+        sel.innerHTML = '<option value="">-- Choose Student --</option>';
+        return;
+      }
+      sel.innerHTML = '<option value="">-- Choose Student --</option>' +
+        Object.entries(data.students[activeClass])
+          .filter(([_, s]) => s.status !== "dropped")
+          .map(([id, s]) => `
+            <option value="${id}">${s.name}</option>
+          `).join('');
+    }
+
+    function printSF9() {
+      viewSection('sf9', null);
+      setTimeout(() => {
+        window.print();
+      }, 400);
+    }
+
+    function renderSeating() {
+      const grid = document.getElementById('seatingGrid');
+      const unseated = document.getElementById('unseatedList');
+      grid.innerHTML = '';
+      unseated.innerHTML = '';
+
+      if (!activeClass) return;
+
+      const students = Object.entries(data.students[activeClass] || {})
+        .filter(([_, s]) => s.status !== "dropped");
+      const seating = data.seating[activeClass] || [];
+      const seatedIds = new Set(seating.filter(Boolean));
+
+      seating.forEach((sid, i) => {
+        const st = students.find(([id]) => id === sid)?.[1];
+        grid.innerHTML += `
+          <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; background: #f8fafc; min-height: 64px; display: flex; align-items: center; justify-content: center; text-align: center;"
+               data-seat-index="${i}">
+            ${st ? `
+              <div draggable="${!isArchivedYear()}" data-dragged-id="${sid}" style="background: #4f46e5; color: white; padding: 8px; border-radius: 6px; font-size: 12px; cursor: ${isArchivedYear() ? 'not-allowed' : 'move'};">
+                ${st.name}
+              </div>` : `<span style="color: #cbd5e1; font-size: 12px;">Empty</span>`}
+          </div>
+        `;
+      });
+
+      students.forEach(([sid, st]) => {
+        if (!seatedIds.has(sid)) {
+          unseated.innerHTML += `
+            <div draggable="${!isArchivedYear()}" data-dragged-id="${sid}" style="background: #e2e8f0; padding: 8px 12px; border-radius: 6px; font-size: 12px; cursor: ${isArchivedYear() ? 'not-allowed' : 'move'};">
+              ${st.name}
+            </div>
+          `;
+        }
+      });
+
+      document.querySelectorAll('[data-dragged-id]').forEach(el => {
+        el.addEventListener('dragstart', function() {
+          draggedId = this.dataset.draggedId;
+        });
+      });
+
+      document.querySelectorAll('[data-seat-index]').forEach(seat => {
+        seat.addEventListener('dragover', e => {
+          e.preventDefault();
+        });
+        seat.addEventListener('drop', function() {
+          const index = parseInt(this.dataset.seatIndex);
+          if (isArchivedYear()) return;
+          if (!draggedId || !activeClass) return;
+          data.seating[activeClass][index] = draggedId;
+          draggedId = null;
+          save();
+          renderSeating();
+        });
+      });
+    }
+
+    function stats() {
+      let totalStudents = 0;
+      Object.values(data.students).forEach(cls => {
+        Object.values(cls).forEach(s => {
+          if (s.status !== "dropped") totalStudents++;
+        });
+      });
+
+      let gradeCount = 0;
+      if (activeClass) {
+        Object.values(data.grades[activeClass] || {}).forEach(stu => {
+          Object.values(stu || {}).forEach(subj => {
+            Object.values(subj || {}).forEach(q => {
+              if (q.quiz.length || q.exam.length || q.project.length) {
+                gradeCount++;
+              }
+            });
+          });
+        });
+      }
+
+      document.getElementById('stat-students').textContent = totalStudents;
+      document.getElementById('stat-classes').textContent = Object.keys(data.classes).length;
+      document.getElementById('stat-attendance').textContent =
+        activeClass ? Object.keys(data.attendance[activeClass] || {}).length : 0;
+      document.getElementById('stat-grades').textContent = gradeCount;
+    }
+
+    function viewSection(section, btn) {
+      document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+      document.getElementById(section).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      if (section === 'sf9') populateSF9();
+      if (section === 'attendance')
+        document.getElementById('attendanceDate').value =
+          new Date().toISOString().slice(0, 10);
+      if (section === 'grades') renderSubjects();
+    }
+
+    function render() {
+      renderSchoolYears();
+      renderNav();
+      renderGlobalClass();
+      renderClasses();
+      renderStudents();
+      renderAttendance();
+      renderSubjects();
+      renderGrades();
+      renderSeating();
+      stats();
+      updateEditability();
+      forceEnableBootstrapActions();
+      applyClassLock();
+      attachEventListeners();
+    }
+
+    function attachEventListeners() {
+      if (eventsBound) return;
+      eventsBound = true;
+
+      // School year
+      document.getElementById('schoolYear').addEventListener('change', (e) => {
+        activeYear = e.target.value;
+        data = store[activeYear];
+        localStorage.setItem('activeYear', activeYear);
+        localStorage.removeItem('activeClass');
+        activeClass = '';
+        render();
+      });
+
+      document.getElementById('btnAddSchoolYear').addEventListener('click', addSchoolYear);
+
+      // Global class selector
+      document.getElementById('globalClass').addEventListener('change', (e) => {
+        selectClass(e.target.value);
+      });
+
+      // PIN
+      document.getElementById('setPinBtn').addEventListener('click', setClassPin);
+      document.getElementById('btnUnlockClass').addEventListener('click', unlockClass);
+
+      // Classes
+      document.getElementById('btnAddClass').addEventListener('click', addClass);
+
+      // Students
+      document.getElementById('btnAddStudent').addEventListener('click', addStudent);
+      document.getElementById('btnTransferStudent').addEventListener('click', transferStudent);
+      document.getElementById('btnDropStudent').addEventListener('click', dropStudent);
+
+      // Attendance
+      document.getElementById('btnMarkAll1').addEventListener('click', () => markAll('present'));
+      document.getElementById('btnMarkAll2').addEventListener('click', () => markAll('absent'));
+
+      // Grades
+      document.getElementById('wQuiz').addEventListener('change', () => {
+        renderGrades();
+      });
+      document.getElementById('wExam').addEventListener('change', () => {
+        renderGrades();
+      });
+      document.getElementById('wProject').addEventListener('change', () => {
+        renderGrades();
+      });
+
+      document.getElementById('btnSaveWeights').addEventListener('click', saveWeights);
+
+      document.querySelectorAll('input[name="transMode"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+          setTransmutationMode(e.target.value);
+        });
+      });
+
+      document.getElementById('btnLockTrans').addEventListener('click', lockTransmutation);
+
+      document.getElementById('subject').addEventListener('change', renderGrades);
+      document.getElementById('quarter').addEventListener('change', renderGrades);
+
+      document.getElementById('btnAddSubject').addEventListener('click', addSubject);
+
+      // SF9
+      document.getElementById('sf9Student').addEventListener('change', renderSF9);
+      document.getElementById('btnPrintSF9').addEventListener('click', exportSF9PDF);
+      document.getElementById('btnExportF137').addEventListener('click', exportForm137PDF);
+      document.getElementById('btnShareParent').addEventListener('click', () => {
+        showParentShare(document.getElementById('sf9Student').value);
+      });
+
+      // Seating
+      document.getElementById('btnRandomize').addEventListener('click', randomizeSeating);
+
+      // School info
+      document.getElementById('btnSaveSchool').addEventListener('click', saveSchoolInfo);
+
+      // Student modal
+      document.getElementById('btnCloseStudentModal').addEventListener('click', closeStudentProfile);
+      document.getElementById('parent-toggle').addEventListener('change', (e) => {
+        toggleParentView(e.target.checked);
+      });
+      document.getElementById('studentPhotoInput').addEventListener('change', (e) => {
+        uploadStudentPhoto(e.target);
+      });
+      document.getElementById('btnShareStudent').addEventListener('click', () => {
+        showParentShare(currentStudentId);
+      });
+      document.getElementById('btnSaveStudent').addEventListener('click', saveStudentInfo);
+      document.getElementById('btnAddNote').addEventListener('click', addBehaviorNote);
+      document.getElementById('btnExportStudent').addEventListener('click', () => {
+        exportStudentPDF(currentStudentId);
+      });
+
+      // Parent share modal
+      document.getElementById('btnCopyShareLink').addEventListener('click', copyShareLink);
+      document.getElementById('btnShareMessenger').addEventListener('click', shareMessenger);
+      document.getElementById('btnShareSMS').addEventListener('click', shareSMS);
+      document.getElementById('btnCloseParentShare').addEventListener('click', closeParentShare);
+
+      // Tour
+      document.getElementById("tour-next").addEventListener("click", () => {
+        tourIndex++;
+        if (tourIndex >= tourSteps.length) {
+          endTour();
+        } else {
+          showTourStep();
+        }
+      });
+
+      document.getElementById("tour-skip").addEventListener("click", endTour);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      try {
+        if (!localStorage.getItem("teacherName")) {
+          loginTeacher();
+        } else {
+          teacherName = localStorage.getItem("teacherName");
+          activeClass = localStorage.getItem('activeClass') || '';
+          render();
+          document.getElementById('attendanceDate').value =
+            new Date().toISOString().slice(0, 10);
+
+          setTimeout(startTour, 600);
+        }
+      } catch (e) {
+        // fail silently
+      }
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9cfe3fe351a9febc',t:'MTc3MTQyNTMxMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
