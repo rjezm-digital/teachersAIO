@@ -1592,10 +1592,7 @@
       tbody.innerHTML = students.map(([id, s]) => {
         const g = data.grades[activeClass]?.[id]?.[subject]?.[quarter] || { quiz: [], exam: [], project: [] };
 
-        const hasScores = g.quiz.length > 0 || g.exam.length > 0 || g.project.length > 0;
-        
-          `;
-        }
+            
 
         const raw = computeWeightedGrade(g.quiz, g.exam, g.project, w);
         const final = transmuteGrade(raw);
@@ -1605,33 +1602,42 @@
         return `
           <tr>
             <td><a href="#" class="student-link" data-student-id="${id}" style="color: #3b82f6; cursor: pointer;">${s.name}</a></td>
-            <td style="text-align: center;"><input
+<td style="text-align: center;">
+  <input
     type="text"
     placeholder="e.g. 85 or 17/20"
-    class="input text-xs w-20 text-center"
-    onkeydown="if(event.key==='Enter'){addScore('${id}','quiz',this.value);this.value=''}"
+    class="input text-xs w-20 text-center grade-input"
+    data-sid="${id}"
+    data-type="quiz"
   />
   <div class="text-xs text-gray-500 mt-1">
     Avg: ${g.quiz.length ? avg(g.quiz).toFixed(1) : '-'}
   </div>
-            <td style="text-align: center;"><input
+</td>
+<td style="text-align: center;">
+  <input
     type="text"
     placeholder="e.g. 85 or 17/20"
-    class="input text-xs w-20 text-center"
-    onkeydown="if(event.key==='Enter'){addScore('${id}','exam',this.value);this.value=''}"
+    class="input text-xs w-20 text-center grade-input"
+    data-sid="${id}"
+    data-type="exam"
   />
   <div class="text-xs text-gray-500 mt-1">
     Avg: ${g.exam.length ? avg(g.exam).toFixed(1) : '-'}
   </div>
-            <td style="text-align: center;"><input
+</td>
+<td style="text-align: center;">
+  <input
     type="text"
     placeholder="e.g. 85 or 17/20"
-    class="input text-xs w-20 text-center"
-    onkeydown="if(event.key==='Enter'){addScore('${id}','project',this.value);this.value=''}"
+    class="input text-xs w-20 text-center grade-input"
+    data-sid="${id}"
+    data-type="project"
   />
   <div class="text-xs text-gray-500 mt-1">
     Avg: ${g.project.length ? avg(g.project).toFixed(1) : '-'}
   </div>
+</td>
             <td style="text-align: center;"><strong style="font-size: 14px; color: #667eea;">${final}</strong></td>
             <td style="text-align: center;"><strong style="font-size: 14px;">${rank}</strong></td>
           </tr>
