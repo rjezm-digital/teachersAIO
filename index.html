@@ -2380,23 +2380,21 @@
 
       document.getElementById("tour-skip").addEventListener("click", endTour);
     }
+    
+    document.body.classList.remove("parent-view");
+document.getElementById("parentBanner").style.display = "none";
 
     document.addEventListener("DOMContentLoaded", () => {
-      try {
-        if (!localStorage.getItem("teacherName")) {
-          loginTeacher();
-        } else {
-          teacherName = localStorage.getItem("teacherName");
-          activeClass = localStorage.getItem('activeClass') || '';
-          render();
-          document.getElementById('attendanceDate').value =
-            new Date().toISOString().slice(0, 10);
+  teacherName = "TEST_TEACHER";
+  localStorage.setItem("teacherName", teacherName);
 
-          setTimeout(startTour, 600);
-        }
-      } catch (e) {
-        // fail silently
-      }
-    });
+  activeClass = localStorage.getItem('activeClass') || '';
+  render();
+
+  document.getElementById('attendanceDate').value =
+    new Date().toISOString().slice(0, 10);
+
+  setTimeout(startTour, 600);
+});
   </body>
 </html>
