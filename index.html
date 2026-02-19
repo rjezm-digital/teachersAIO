@@ -848,11 +848,19 @@ localStorage.setItem("teacherName", teacherName);
     }
 
     function isClassLocked() {
-      if (!activeClass || !data.classes[activeClass]) return false;
-      const c = data.classes[activeClass];
-      if (c.owner && c.owner !== teacherName) return true;
-      return c.pin && !c.unlocked;
-    }
+  if (!activeClass || !data.classes[activeClass]) return false;
+
+  const c = data.classes[activeClass];
+
+  // 🔧 FIX: owner-less classes are editable
+  if (!c.owner) return false;
+
+  // 🔧 FIX: owner match is case-safe
+  if (String(c.owner) !== String(teacherName)) return true;
+
+  // PIN logic
+  return Boolean(c.pin && !c.unlocked);
+}
 
     function applyClassLock() {
       const locked = isClassLocked();
@@ -967,7 +975,7 @@ localStorage.setItem("teacherName", teacherName);
       const name = document.getElementById('classInput').value.trim();
       if (!name) return;
       const id = 'CLS' + Date.now();
-      data.classes[id] = { name, pin: '', unlocked: false, owner: teacherName };
+      data.classes[id] = { name, pin: '', unlocked: true, owner: teacherName };
       data.students[id] = {};
       data.attendance[id] = {};
       data.grades[id] = {};
