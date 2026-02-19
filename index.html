@@ -1490,7 +1490,14 @@ localStorage.setItem("teacherName", teacherName);
       }
 
       const students = data.students[activeClass] || {};
-      const subject = document.getElementById('subject').value;
+      const subjectSelect = document.getElementById('subject');
+
+// ✅ FIX 1: ensure a subject is selected
+if (!subjectSelect.value) {
+  subjectSelect.value = data.subjects[activeClass]?.[0] || "";
+}
+
+const subject = subjectSelect.value;
       const quarter = document.getElementById('quarter').value;
       const w = data.weights;
 
@@ -1995,8 +2002,10 @@ if (!hasScores) {
       if (section === 'attendance')
         document.getElementById('attendanceDate').value =
           new Date().toISOString().slice(0, 10);
-      if (section === 'grades') renderSubjects();
-    }
+      if (section === 'grades') {
+  renderSubjects();
+  renderGrades(); // ✅ force re-render AFTER subjects load
+}
 
     function render() {
       renderSchoolYears();
