@@ -2150,7 +2150,17 @@ eventsBound = true;
 
     document.addEventListener("DOMContentLoaded", () => {
   activeClass = localStorage.getItem('activeClass') || '';
-  render();
+
+// ✅ AUTO-SELECT FIRST CLASS IF NONE IS SELECTED
+if (!activeClass) {
+  const classIds = Object.keys(data.classes || {});
+  if (classIds.length > 0) {
+    activeClass = classIds[0];
+    localStorage.setItem("activeClass", activeClass);
+  }
+}
+
+render();
   attachEventListeners();
 
   const d = document.getElementById('attendanceDate');
