@@ -556,11 +556,11 @@
   </div>
 
   <script>
+      
     let eventsBound = false;
-
-    window.addEventListener("error", () => {
-      // silently fail — prevents Canva panic reload
-    });
+    window.addEventListener("error", (e) => {
+  console.warn("Suppressed error:", e.message);
+});
 
     const DEPED_TABLE = [
       { min: 96, grade: 100 }, { min: 94, grade: 99 }, { min: 92, grade: 98 }, { min: 90, grade: 97 },
@@ -759,11 +759,9 @@
       };
     }
 
-    let teacherName = localStorage.getItem("teacherName");
-    if (!teacherName) {
-      teacherName = prompt("Enter your name (Teacher):");
-      localStorage.setItem("teacherName", teacherName || "Teacher");
-    }
+    let teacherName = localStorage.getItem("teacherName") || "TEST_TEACHER";
+localStorage.setItem("teacherName", teacherName);
+
 
     let activeClass = '';
     let currentStudentId = null;
@@ -830,7 +828,7 @@
             } else {
               document.body.innerText = "Record not found.";
             }
-          }, 300);
+          }, 600);
         });
       }
     }
@@ -1445,34 +1443,44 @@
     }
 
     function renderAttendance() {
-      const tbody = document.getElementById('attendanceTable');
-      if (!activeClass) {
-        tbody.innerHTML = '';
-        return;
-      }
+  const tbody = document.getElementById('attendanceTable');
+  if (!activeClass) {
+    tbody.innerHTML = '';
+    return;
+  }
 
-      const students = data.students[activeClass] || {};
-      const date = document.getElementById('attendanceDate').value;
-      const dayAttendance = data.attendance[activeClass]?.[date] || {};
+  const students = data.students[activeClass] || {};
+  const date = document.getElementById('attendanceDate').value;
 
-      tbody.innerHTML = Object.entries(students).map(([id, s]) => {
-        const status = dayAttendance[id] || '';
-        return `
-          <tr>
-            <td>${s.name}</td>
-            <td style="text-align: center;"><input type="radio" name="att-${id}" value="present" ${status === 'present' ? 'checked' : ''} data-att="${id}" data-status="present"></td>
-            <td style="text-align: center;"><input type="radio" name="att-${id}" value="absent" ${status === 'absent' ? 'checked' : ''} data-att="${id}" data-status="absent"></td>
-            <td style="text-align: center;"><input type="radio" name="att-${id}" value="late" ${status === 'late' ? 'checked' : ''} data-att="${id}" data-status="late"></td>
-          </tr>
-        `;
-      }).join('');
+  data.attendance[activeClass] ??= {};
+  data.attendance[activeClass][date] ??= {};
 
-      tbody.querySelectorAll('input[data-att]').forEach(input => {
-        input.addEventListener('change', function () {
-          setAttendance(this.dataset.att, this.dataset.status);
-        });
-      });
-    }
+  const dayAttendance = data.attendance[activeClass][date];
+
+  tbody.innerHTML = Object.entries(students).map(([id, s]) => {
+    const status = dayAttendance[id] || '';
+    return `
+      <tr>
+        <td>${s.name}</td>
+        <td style="text-align:center">
+          <input type="radio" name="att-${id}" ${status === 'present' ? 'checked' : ''} data-att="${id}" data-status="present">
+        </td>
+        <td style="text-align:center">
+          <input type="radio" name="att-${id}" ${status === 'absent' ? 'checked' : ''} data-att="${id}" data-status="absent">
+        </td>
+        <td style="text-align:center">
+          <input type="radio" name="att-${id}" ${status === 'late' ? 'checked' : ''} data-att="${id}" data-status="late">
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  tbody.querySelectorAll('input[data-att]').forEach(input => {
+    input.addEventListener('change', function () {
+      setAttendance(this.dataset.att, this.dataset.status);
+    });
+  });
+}
 
     function renderGrades() {
       const tbody = document.getElementById('gradesTable');
@@ -1489,8 +1497,21 @@
       tbody.innerHTML = Object.entries(students).map(([id, s]) => {
         const g = data.grades[activeClass]?.[id]?.[subject]?.[quarter] || { quiz: [], exam: [], project: [] };
 
-        const hasScores = g.quiz.length > 0 || g.exam.length > 0 || g.project.length > 0;
-        if (!hasScores) return '';
+const hasScores =
+  g.quiz.length > 0 ||
+  g.exam.length > 0 ||
+  g.project.length > 0;
+  
+if (!hasScores) {
+  return `
+    <tr>
+      <td>${s.name}</td>
+      <td colspan="5" style="text-align:center;color:#9ca3af;">
+        No grades yet
+      </td>
+    </tr>
+  `;
+}
 
         const raw = computeWeightedGrade(g.quiz, g.exam, g.project, w);
         const final = transmuteGrade(raw);
@@ -1990,12 +2011,12 @@
       stats();
       updateEditability();
       applyClassLock();
-      attachEventListeners();
     }
 
     function attachEventListeners() {
-      if (eventsBound) return;
-      eventsBound = true;
+      if (window.__TEACHERS_AIO_EVENTS__) return;
+window.__TEACHERS_AIO_EVENTS__ = true;
+eventsBound = true;
 
       // School year
       document.getElementById('schoolYear').addEventListener('change', (e) => {
@@ -2104,17 +2125,14 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      try {
-        activeClass = localStorage.getItem('activeClass') || '';
-        render();
-        document.getElementById('attendanceDate').value =
-          new Date().toISOString().slice(0, 10);
+  activeClass = localStorage.getItem('activeClass') || '';
+  render();
+  attachEventListeners();
 
-        setTimeout(startTour, 600);
-      } catch (e) {
-        // fail silently
-      }
-    });
-  </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9cfc54994390febc',t:'MTc3MTQwNTE4OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+  const d = document.getElementById('attendanceDate');
+  if (d) d.value = new Date().toISOString().slice(0, 10);
+
+  setTimeout(startTour, 600);
+});
+</body>
 </html>
