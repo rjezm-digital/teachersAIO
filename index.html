@@ -6,7 +6,7 @@
   <title>Teachers AIO</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { font-family: Poppins, sans-serif; }
     body { background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%); box-sizing: border-box; }
@@ -26,7 +26,7 @@
     .card { background: white; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
     .card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.12); transition: all 0.2s ease; }
     
-    #sidebar { width: 320px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 24px; display: flex; flex-direction: column; overflow: hidden; }
+    #sidebar { width: 320px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-right: none; padding: 24px; flex-direction: column; display: flex; overflow-y: auto; }
     
     .sidebar-header { color: white; margin-bottom: 28px; }
     .sidebar-header h1 { font-size: 26px; font-weight: 700; margin: 0; line-height: 1.2; }
@@ -165,10 +165,10 @@
     #parent-share-modal .qr-container { text-align: center; margin-bottom: 16px; }
     #parent-share-modal .qr-container img { max-width: 200px; }
   </style>
-
  </head>
  <body class="h-full">
-  <div id="parentBanner" style="
+  <div id="parentBanner"
+       style="
          display:none;
          position:sticky;
          top:0;
@@ -181,7 +181,7 @@
          text-align:center;
          box-shadow:0 2px 8px rgba(0,0,0,.2);
        ">
-   👨‍👩‍👧 Parent View – Read Only | This report is for viewing only
+    👨‍👩‍👧 Parent View – Read Only | This report is for viewing only
   </div>
   <div id="app">
    <div id="content">
@@ -190,21 +190,31 @@
       <h1>Teachers AIO</h1>
       <p>Classroom Management</p>
      </div>
-     <div class="sidebar-section"><span class="sidebar-section-label">School Year</span>
-      <div class="school-selector"><select id="schoolYear"></select>
-       <div class="flex"><input id="newSchoolYear" type="number" placeholder="e.g. 2025"> <button id="btnAddSchoolYear">+ Add</button>
-       </div>
+     
+     <div class="sidebar-section">
+      <span class="sidebar-section-label">School Year</span>
+      <div class="school-selector">
+        <select id="schoolYear"></select>
+        <div class="flex">
+          <input id="newSchoolYear" type="number" placeholder="e.g. 2025">
+          <button id="btnAddSchoolYear">+ Add</button>
+        </div>
       </div>
      </div>
-     <div class="sidebar-section"><span class="sidebar-section-label">Current Class</span>
-      <div class="class-selector"><select id="globalClass"> <option value="">Select Class</option> </select>
-       <div class="lock-status" id="lockStatus">
-        🔓 Unlocked
-       </div>
-       <div id="pinBox"><input id="pinInput" placeholder="Enter PIN" type="password" class="input" style="max-width: 100%;"> <button id="btnUnlockClass" class="btn" style="width: 100%; font-size: 12px;">Unlock</button>
-       </div><button id="setPinBtn" class="btn bg-purple text-xs mt-2 editable" style="width: 100%; font-size: 12px;">🔐 Set / Change Class PIN</button>
+     
+     <div class="sidebar-section">
+      <span class="sidebar-section-label">Current Class</span>
+      <div class="class-selector">
+        <select id="globalClass"> <option value="">Select Class</option> </select>
+        <div class="lock-status" id="lockStatus">🔓 Unlocked</div>
+        <div id="pinBox">
+          <input id="pinInput" placeholder="Enter PIN" type="password" class="input" style="max-width: 100%;">
+          <button id="btnUnlockClass" class="btn" style="width: 100%; font-size: 12px;">Unlock</button>
+        </div>
+        <button id="setPinBtn" class="btn bg-purple text-xs mt-2 editable" style="width: 100%; font-size: 12px;">🔐 Set / Change Class PIN</button>
       </div>
      </div>
+     
      <nav id="nav"></nav>
     </aside>
     <main id="main">
@@ -251,9 +261,10 @@
      <section id="classes" class="view hidden">
       <h2 class="text-3xl font-bold text-gray-900 mb-2">Manage Classes</h2>
       <p class="text-gray-600 mb-8">Create and organize your classes</p>
-      <div class="card p-6 mb-6">
-       <label class="block text-sm font-600 text-gray-700 mb-3">Add New Class</label>
-       <div class="flex gap-3 items-center"><input id="classInput" placeholder="Enter class name" class="input" style="max-width: 260px;"> <button id="btnAddClass" class="btn editable">+ Add Class</button>
+      <div class="card p-6 mb-6"><label class="block text-sm font-600 text-gray-700 mb-3">Add New Class</label>
+       <div class="flex gap-3 items-center">
+        <input id="classInput" placeholder="Enter class name" class="input" style="max-width: 260px;">
+        <button id="btnAddClass" class="btn editable">+ Add Class</button>
        </div>
       </div>
       <div class="text-sm font-600 text-gray-700 mb-4">
@@ -264,10 +275,13 @@
      <section id="students" class="view hidden">
       <h2 class="text-3xl font-bold text-gray-900 mb-2">Manage Students</h2>
       <p class="text-gray-600 mb-8">Add and organize your student roster</p>
-      <div class="card p-6 mb-6">
-       <label class="block text-sm font-600 text-gray-700 mb-3">Add New Student</label>
-       <div class="flex gap-3">
-        <input id="studentInput" placeholder="Enter student name" class="input" style="max-width: 260px;"> <button id="btnAddStudent" class="btn editable">+ Add Student</button>
+      <div class="card p-6 mb-6"><label class="block text-sm font-600 text-gray-700 mb-3">Add New Student</label>
+       <div class="flex gap-3"><input
+        id="studentInput"
+        placeholder="Enter student name"
+        class="input"
+        style="max-width: 260px;"
+       > <button id="btnAddStudent" class="btn editable">+ Add Student</button>
        </div>
       </div>
       <div class="text-sm font-600 text-gray-700 mb-4">
@@ -280,8 +294,7 @@
       <p class="text-gray-600 mb-8">Track attendance by date</p>
       <div class="card p-6 mb-6">
        <div class="flex gap-3 items-end flex-wrap">
-        <div>
-         <label class="block text-sm font-600 text-gray-700 mb-2">Date</label> <input id="attendanceDate" type="date" class="input">
+        <div><label class="block text-sm font-600 text-gray-700 mb-2">Date</label> <input id="attendanceDate" type="date" class="input">
         </div><button id="btnMarkAll1" class="btn editable">✓ All Present</button> <button id="btnMarkAll2" class="btn editable bg-red">✗ All Absent</button>
        </div>
       </div>
@@ -306,26 +319,37 @@
        <div class="card p-6">
         <p class="text-sm font-600 text-gray-700 mb-4">⚙️ Grade Weights</p>
         <div class="space-y-3 mb-4">
-         <div>
-          <label class="text-xs font-600 text-gray-600 mb-1 block">Quiz</label> <input id="wQuiz" type="number" value="30" class="input w-full">
+         <div><label class="text-xs font-600 text-gray-600 mb-1 block">Quiz</label> <input id="wQuiz" type="number" value="30" class="input w-full">
          </div>
-         <div>
-          <label class="text-xs font-600 text-gray-600 mb-1 block">Exam</label> <input id="wExam" type="number" value="40" class="input w-full">
+         <div><label class="text-xs font-600 text-gray-600 mb-1 block">Exam</label> <input id="wExam" type="number" value="40" class="input w-full">
          </div>
-         <div>
-          <label class="text-xs font-600 text-gray-600 mb-1 block">Project</label> <input id="wProject" type="number" value="30" class="input w-full">
+         <div><label class="text-xs font-600 text-gray-600 mb-1 block">Project</label> <input id="wProject" type="number" value="30" class="input w-full">
          </div>
         </div><button id="btnSaveWeights" class="btn editable w-full text-sm">Save</button>
        </div>
        <div class="card p-6">
         <h3 class="font-semibold mb-3 text-sm">📘 Transmutation</h3>
-        <div class="flex gap-4 items-center mb-3 text-sm"><label class="flex items-center gap-2"><input type="radio" name="transMode" value="deped"> DepEd</label> <label class="flex items-center gap-2"><input type="radio" name="transMode" value="custom"> Custom</label>
-        </div><button id="btnLockTrans" class="btn bg-red editable w-full text-sm">🔒 Lock</button>
+        <div class="flex gap-4 items-center mb-3 text-sm">
+         <label class="flex items-center gap-2"><input type="radio" name="transMode" value="deped"> DepEd</label>
+         <label class="flex items-center gap-2"><input type="radio" name="transMode" value="custom"> Custom</label>
+        </div>
+        <button id="btnLockTrans" class="btn bg-red editable w-full text-sm">🔒 Lock</button>
         <p class="text-xs text-gray-500 mt-2">Cannot change once locked</p>
        </div>
        <div class="card p-6">
-        <p class="text-sm font-600 text-gray-700 mb-4">📚 Subject</p><select id="subject" class="input mb-3" style="max-width: 220px;"></select>
-        <div class="flex gap-2 items-center"><input id="newSubject" placeholder="New subject" class="input text-sm" style="max-width: 180px;"> <button id="btnAddSubject" class="btn editable text-sm">+</button>
+        <p class="text-sm font-600 text-gray-700 mb-4">📚 Subject</p><select
+         id="subject"
+         class="input mb-3"
+         style="max-width: 220px;"
+        ></select>
+        <div class="flex gap-2 items-center">
+         <input
+          id="newSubject"
+          placeholder="New subject"
+          class="input text-sm"
+          style="max-width: 180px;"
+         >
+         <button id="btnAddSubject" class="btn editable text-sm">+</button>
         </div>
        </div>
        <div class="card p-6">
@@ -351,20 +375,17 @@
      <section id="sf9" class="view hidden">
       <h2 class="text-3xl font-bold text-gray-900 mb-2">SF9 – Report Card</h2>
       <p class="text-gray-600 mb-8">View and print student report cards</p>
-      <div class="card p-6 mb-6">
-       <label class="text-sm font-600 text-gray-700 mb-2 block">Select Student</label> <select id="sf9Student" class="input w-full max-w-xs"> <option value="">-- Choose Student --</option> </select>
+      <div class="card p-6 mb-6"><label class="text-sm font-600 text-gray-700 mb-2 block">Select Student</label> <select id="sf9Student" class="input w-full max-w-xs"> <option value="">-- Choose Student --</option> </select>
       </div>
       <div id="sf9Content" class="card p-6 mb-6"></div>
-      <div class="flex gap-3">
-       <button type="button" class="btn bg-purple export-btn" id="btnPrintSF9"> 🖨️ Save as PDF </button> <button type="button" class="btn bg-purple export-btn" id="btnExportF137"> 📘 Export Form 137 </button> <button type="button" class="btn export-btn" id="btnShareParent" style="display: none;"> 🔗 Share with Parent </button>
+      <div class="flex gap-3"><button type="button" class="btn bg-purple export-btn" id="btnPrintSF9"> 🖨️ Save as PDF </button> <button type="button" class="btn export-btn" id="btnShareParent" style="display: none;"> 🔗 Share with Parent </button>
       </div>
       <p class="text-xs text-gray-500 mt-2">PDF will download automatically with all grades and rankings</p>
      </section>
      <section id="seating" class="view hidden">
       <h2 class="text-3xl font-bold text-gray-900 mb-2">Seating Arrangement</h2>
       <p class="text-gray-600 mb-8">Drag students to customize seating</p>
-      <div class="card p-6 mb-6">
-       <button id="btnRandomize" class="btn editable">🔄 Randomize</button>
+      <div class="card p-6 mb-6"><button id="btnRandomize" class="btn editable">🔄 Randomize</button>
       </div>
       <div class="card p-6 mb-6">
        <p class="text-sm font-600 text-gray-700 mb-4">Classroom Seating (20 seats)</p>
@@ -379,16 +400,13 @@
       <h2 class="text-3xl font-bold text-gray-900 mb-2">School Information</h2>
       <p class="text-gray-600 mb-8">Configure school details for reports</p>
       <div class="card p-6 space-y-6">
-       <div>
-        <label class="text-sm font-600 text-gray-700 mb-2 block">School Name</label> <input id="schoolName" type="text" placeholder="Enter school name" class="input w-full">
+       <div><label class="text-sm font-600 text-gray-700 mb-2 block">School Name</label> <input id="schoolName" type="text" placeholder="Enter school name" class="input w-full">
        </div>
-       <div>
-        <label class="text-sm font-600 text-gray-700 mb-2 block">Class Adviser</label> <input id="adviser" type="text" placeholder="Enter adviser name" class="input w-full">
+       <div><label class="text-sm font-600 text-gray-700 mb-2 block">Class Adviser</label> <input id="adviser" type="text" placeholder="Enter adviser name" class="input w-full">
        </div>
-       <div>
-        <label class="text-sm font-600 text-gray-700 mb-2 block">School Logo</label> <input id="logo" type="file" accept="image/*" class="input w-full">
+       <div><label class="text-sm font-600 text-gray-700 mb-2 block">School Logo</label> <input id="logo" type="file" accept="image/*" class="input w-full">
         <div id="logoPreview" class="mt-4"></div>
-       </div><button id="btnSaveSchool" class="btn editable">💾 Save School Info</button>
+       </div><button id="btnSaveSchool" class="btn editable" >💾 Save School Info</button>
       </div>
      </section>
     </main>
@@ -406,40 +424,37 @@
      </div><button id="btnCloseStudentModal" class="text-xl">✕</button>
     </div>
     <div class="p-6 space-y-6 max-h-[75vh] overflow-auto">
-     <div class="flex items-center gap-2">
-      <input type="checkbox" id="parent-toggle"> <label for="parent-toggle" class="text-sm font-600">Enable Parent View</label>
+     <div class="flex items-center gap-2"><input type="checkbox" id="parent-toggle"> <label for="parent-toggle" class="text-sm font-600">Enable Parent View</label>
      </div>
      <div class="flex gap-3">
-      <div class="border-b pb-4 flex-1">
-       <label class="text-sm font-600 text-gray-700 mb-2 block">Student Photo</label> <input id="studentPhotoInput" type="file" accept="image/*" class="input w-full"> <img id="student-photo" class="w-24 h-24 rounded-full object-cover mt-2">
-      </div><button type="button" class="btn bg-purple export-btn" id="btnShareStudent" style="align-self: flex-end; white-space: nowrap;">🔗 Share</button>
+      <div class="border-b pb-4 flex-1"><label class="text-sm font-600 text-gray-700 mb-2 block">Student Photo</label> <input id="studentPhotoInput" type="file" accept="image/*" class="input w-full"> <img id="student-photo" class="w-24 h-24 rounded-full object-cover mt-2">
+      </div>
+      <button type="button" class="btn bg-purple export-btn" id="btnShareStudent" style="align-self: flex-end; white-space: nowrap;">🔗 Share</button>
      </div>
      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-      <div>
-       <b>ID:</b> <span id="pv-id"></span>
+      <div><b>ID:</b> <span id="pv-id"></span>
       </div>
-      <div>
-       <b>Birthdate:</b> <span id="pv-birthdate"></span>
+      <div><b>Birthdate:</b> <span id="pv-birthdate"></span>
       </div>
-      <div>
-       <b>Guardian:</b> <span id="pv-guardian"></span>
+      <div><b>Guardian:</b> <span id="pv-guardian"></span>
       </div>
-      <div>
-       <b>Mobile:</b> <span id="pv-mobile"></span>
+      <div><b>Mobile:</b> <span id="pv-mobile"></span>
       </div>
      </div>
      <div class="border-b pb-4 space-y-3">
       <h3 class="font-semibold">Student Information</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-       <div><label class="text-sm font-600 text-gray-700">Student Name</label> <input id="sp-name-edit" class="input w-full">
+       <div>
+        <label class="text-sm font-600 text-gray-700">Student ID</label> <input id="sp-studentId" class="input w-full" placeholder="e.g. 2024-001">
        </div>
-       <div><label class="text-sm font-600 text-gray-700">Student ID</label> <input id="sp-studentId" class="input w-full" placeholder="e.g. 2024-001">
+       <div>
+        <label class="text-sm font-600 text-gray-700">Birthdate</label> <input id="sp-birthdate" type="date" class="input w-full">
        </div>
-       <div><label class="text-sm font-600 text-gray-700">Birthdate</label> <input id="sp-birthdate" type="date" class="input w-full">
+       <div>
+        <label class="text-sm font-600 text-gray-700">Parent / Guardian</label> <input id="sp-guardian" class="input w-full" placeholder="Parent or Guardian Name">
        </div>
-       <div><label class="text-sm font-600 text-gray-700">Parent / Guardian</label> <input id="sp-guardian" class="input w-full" placeholder="Parent or Guardian Name">
-       </div>
-       <div><label class="text-sm font-600 text-gray-700">Mobile Number</label> <input id="sp-mobile" class="input w-full" placeholder="09XXXXXXXXX">
+       <div>
+        <label class="text-sm font-600 text-gray-700">Mobile Number</label> <input id="sp-mobile" class="input w-full" placeholder="09XXXXXXXXX">
        </div>
       </div><button id="btnSaveStudent" class="btn editable mt-3">💾 Save Student Info</button>
      </div>
@@ -497,43 +512,54 @@
      </div>
      <div class="card p-4">
       <h3 class="font-semibold mb-2">📝 Auto-Generated Remarks</h3>
-      <p id="auto-remarks" class="text-sm text-gray-700 leading-relaxed">No data available yet.</p>
+      <p id="auto-remarks" class="text-sm text-gray-700 leading-relaxed">
+        No data available yet.
+      </p>
      </div>
      <div class="border-t pt-4">
       <h3 class="font-semibold mb-3">Behavior / Notes</h3><textarea id="behavior-note" class="w-full border rounded p-2 input" placeholder="Write a note..."></textarea> <button id="btnAddNote" class="btn editable mt-2">Add Note</button>
       <ul id="behavior-list" class="mt-3 space-y-2"></ul>
-     </div>
-     <div class="card p-4">
-      <h3 class="font-semibold mb-2">📦 Transfer History</h3>
-      <ul id="transfer-history" class="text-sm space-y-1"></ul>
-     </div><button id="btnTransferStudent" class="btn bg-red editable mt-3"> 🔄 Transfer Student </button> <button id="btnDropStudent" class="btn bg-red editable mt-2"> 🚫 Mark as Dropped </button><button id="btnExportStudent" class="btn export-btn w-full">📄 Export Student PDF</button>
+     </div><button id="btnExportStudent" class="btn export-btn w-full">📄 Export Student PDF</button>
     </div>
    </div>
   </div>
+
   <div id="parent-share-modal">
-   <div class="modal-content">
-    <h3>📱 Share with Parent</h3>
-    <div class="share-url" id="shareUrl"></div>
-    <div class="qr-container"><img id="qrCode" alt="QR Code">
+    <div class="modal-content">
+      <h3>📱 Share with Parent</h3>
+      <div class="share-url" id="shareUrl"></div>
+      <div class="qr-container">
+        <img id="qrCode" alt="QR Code">
+      </div>
+      <div class="modal-actions" style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn" id="btnCopyShareLink">📋 Copy Link</button>
+        <button class="btn" id="btnShareMessenger">💬 Messenger</button>
+        <button class="btn" id="btnShareSMS">📩 SMS</button>
+        <button class="btn bg-red" id="btnCloseParentShare">Close</button>
+      </div>
+
+      <p style="font-size:11px;color:#6b7280;margin-top:8px;">
+        Messages are sent using your phone's app. Regular SMS charges may apply.
+      </p>
     </div>
-    <div class="modal-actions" style="display:flex; gap:8px; flex-wrap:wrap;"><button class="btn" id="btnCopyShareLink">📋 Copy Link</button> <button class="btn" id="btnShareMessenger">💬 Messenger</button> <button class="btn" id="btnShareSMS">📩 SMS</button> <button class="btn bg-red" id="btnCloseParentShare">Close</button>
-    </div>
-    <p style="font-size:11px;color:#6b7280;margin-top:8px;">Messages are sent using your phone's app. Regular SMS charges may apply.</p>
-   </div>
   </div>
+
   <div id="tour" class="hidden fixed inset-0 z-[9999]">
-   <div class="absolute inset-0 bg-black/40"></div>
-   <div id="tour-box" class="absolute bg-white rounded-lg shadow-xl p-4 max-w-xs text-sm">
-    <div id="tour-text" class="mb-3 font-medium"></div>
-    <div class="flex justify-between items-center"><button id="tour-skip" class="text-gray-500 text-xs">Skip</button> <button id="tour-next" class="btn text-xs">Next</button>
+    <div class="absolute inset-0 bg-black/40"></div>
+    <div id="tour-box" class="absolute bg-white rounded-lg shadow-xl p-4 max-w-xs text-sm">
+      <div id="tour-text" class="mb-3 font-medium"></div>
+      <div class="flex justify-between items-center">
+        <button id="tour-skip" class="text-gray-500 text-xs">Skip</button>
+        <button id="tour-next" class="btn text-xs">Next</button>
+      </div>
     </div>
-   </div>
   </div>
+
   <script>
     let eventsBound = false;
 
-    window.addEventListener("error", (e) => {
-      alert("JS Error: " + e.message);
+    window.addEventListener("error", () => {
+      // silently fail — prevents Canva panic reload
     });
 
     const DEPED_TABLE = [
@@ -548,7 +574,7 @@
       { id: 'classes', label: '🏫 Classes', section: 'MAIN' },
       { id: 'students', label: '👥 Students', section: 'MAIN' },
       { id: 'attendance', label: '📊 Attendance', section: 'TRACKING' },
-      { id: 'grades', label: '📕 Grade Book', section: 'TRACKING' },
+      { id: 'grades', label: '🎯 Grade Book', section: 'TRACKING' },
       { id: 'sf9', label: '📄 SF9 Report', section: 'REPORTS' },
       { id: 'seating', label: '🪑 Seating', section: 'TOOLS' },
       { id: 'school', label: '⚙️ School Info', section: 'SETTINGS' }
@@ -733,38 +759,16 @@
       };
     }
 
-    let teachers = JSON.parse(localStorage.getItem("teachers")) || {};
-    let teacherName = '';
+    let teacherName = localStorage.getItem("teacherName");
+    if (!teacherName) {
+      teacherName = prompt("Enter your name (Teacher):");
+      localStorage.setItem("teacherName", teacherName || "Teacher");
+    }
+
     let activeClass = '';
     let currentStudentId = null;
     let store = JSON.parse(localStorage.getItem('teacherAIO')) || {};
     let activeYear = localStorage.getItem('activeYear') || '';
-
-    function loginTeacher() {
-      let name = prompt("Teacher name:");
-      if (!name) return;
-
-      if (!teachers[name]) {
-        const pin = prompt("Set a 4-digit PIN:");
-        if (!/^\d{4}$/.test(pin)) {
-          alert("Invalid PIN");
-          return;
-        }
-        teachers[name] = { pin };
-        localStorage.setItem("teachers", JSON.stringify(teachers));
-      } else {
-        const pin = prompt("Enter PIN:");
-        if (pin !== teachers[name].pin) {
-          alert("Incorrect PIN");
-          return;
-        }
-      }
-
-      localStorage.setItem("teacherName", name);
-      localStorage.setItem("activeYear", activeYear);
-      localStorage.setItem("activeClass", "");
-      setTimeout(() => location.reload(), 100);
-    }
 
     if (!activeYear) {
       const year = new Date().getFullYear();
@@ -795,43 +799,39 @@
       if (!["Q1","Q2","Q3","Q4"].includes(qrQuarter)) {
         document.body.innerText = "Record not found.";
       } else {
-        if (!data.transmutation.locked[qrQuarter]) {
-          document.body.innerText = "This report is not finalized.";
-        } else {
-          window.addEventListener("load", () => {
-            if (!classId || !studentId) return;
+        window.addEventListener("load", () => {
+          if (!classId || !studentId) return;
 
-            let foundYear = null;
-            for (const y in store) {
-              if (store[y]?.classes?.[classId]) {
-                foundYear = y;
-                break;
-              }
+          let foundYear = null;
+          for (const y in store) {
+            if (store[y]?.classes?.[classId]) {
+              foundYear = y;
+              break;
             }
+          }
 
-            if (!foundYear) {
+          if (!foundYear) {
+            document.body.innerText = "Record not found.";
+            return;
+          }
+
+          activeYear = foundYear;
+          data = store[foundYear];
+          activeClass = classId;
+
+          localStorage.setItem("activeYear", activeYear);
+          localStorage.setItem("activeClass", activeClass);
+
+          render();
+
+          setTimeout(() => {
+            if (data.students?.[classId]?.[studentId]) {
+              openStudentProfile(studentId);
+            } else {
               document.body.innerText = "Record not found.";
-              return;
             }
-
-            activeYear = foundYear;
-            data = store[foundYear];
-            activeClass = classId;
-
-            localStorage.setItem("activeYear", activeYear);
-            localStorage.setItem("activeClass", activeClass);
-
-            render();
-
-            setTimeout(() => {
-              if (data.students?.[classId]?.[studentId]) {
-                openStudentProfile(studentId);
-              } else {
-                document.body.innerText = "Record not found.";
-              }
-            }, 300);
-          });
-        }
+          }, 300);
+        });
       }
     }
 
@@ -844,10 +844,9 @@
     }
 
     function isArchivedYear() {
-      const years = Object.keys(store);
-      if (years.length <= 1) return false;
-      const latest = years.sort()[years.length - 1];
-      return activeYear !== latest;
+      const years = Object.keys(store).sort();
+      const current = years[years.length - 1];
+      return activeYear !== current;
     }
 
     function isClassLocked() {
@@ -900,14 +899,6 @@
       document.getElementById("yearBadge").classList.toggle("hidden", !archived);
     }
 
-    function forceEnableBootstrapActions() {
-      if (!Object.keys(data.classes || {}).length) {
-        document.querySelectorAll('.editable').forEach(btn => {
-          btn.disabled = false;
-        });
-      }
-    }
-
     function renderSchoolYears() {
       const sel = document.getElementById("schoolYear");
       const years = Object.keys(store).sort();
@@ -949,16 +940,6 @@
     function avg(arr) {
       if (!arr.length) return 0;
       return arr.reduce((a,b)=>a + (b.score ?? b), 0) / arr.length;
-    }
-
-    function isAtRisk(studentId) {
-      const ga = Number(generalAverage(studentId));
-      const att = attendanceSummary(studentId);
-
-      if (!isNaN(ga) && ga < 75) return true;
-      if (att.absent >= 10) return true;
-
-      return false;
     }
 
     function computeWeightedGrade(quizArr, examArr, projectArr, weights) {
@@ -1073,10 +1054,7 @@
 
     function addStudent() {
       if (isArchivedYear()) return;
-      if (!activeClass) {
-        alert("Please select a class first before adding students.");
-        return;
-      }
+      if (!activeClass) return;
       const name = document.getElementById('studentInput').value.trim();
       if (!name) return;
 
@@ -1087,89 +1065,12 @@
         mobile: "",
         birthdate: "",
         behaviorNotes: [],
-        photo: null,
-        transferHistory: [],
-        status: "active"
+        photo: null
       };
 
       save();
       document.getElementById('studentInput').value = '';
       render();
-    }
-
-    function dropStudent() {
-      if (!activeClass || !currentStudentId) return;
-      if (!confirm("Mark this student as DROPPED?")) return;
-
-      data.students[activeClass][currentStudentId].status = "dropped";
-      save();
-      closeStudentProfile();
-      renderStudents();
-    }
-
-    function transferStudent() {
-      if (isArchivedYear()) {
-        alert("Cannot transfer students in archived school years.");
-        return;
-      }
-
-      if (!activeClass || !currentStudentId) return;
-
-      if (isClassLocked()) {
-        alert("Class is locked. Unlock first.");
-        return;
-      }
-
-      const targetClass = prompt("Enter TARGET CLASS NAME (exact name):");
-
-      if (!targetClass) return;
-
-      const targetId = Object.keys(data.classes).find(
-        id => data.classes[id].name === targetClass
-      );
-
-      if (!targetId) {
-        alert("Target class not found.");
-        return;
-      }
-
-      if (targetId === activeClass) {
-        alert("Student is already in this class.");
-        return;
-      }
-
-      const student = data.students[activeClass][currentStudentId];
-
-      student.transferHistory ??= [];
-      student.transferHistory.push({
-        from: data.classes[activeClass].name,
-        to: data.classes[targetId].name,
-        date: new Date().toISOString().slice(0, 10)
-      });
-
-      data.students[targetId] ??= {};
-      data.students[targetId][currentStudentId] = student;
-      delete data.students[activeClass][currentStudentId];
-
-      data.grades[targetId] ??= {};
-      data.grades[targetId][currentStudentId] =
-        data.grades[activeClass]?.[currentStudentId] || {};
-      delete data.grades[activeClass]?.[currentStudentId];
-
-      Object.entries(data.attendance[activeClass] || {}).forEach(([date, day]) => {
-        if (day[currentStudentId]) {
-          data.attendance[targetId] ??= {};
-          data.attendance[targetId][date] ??= {};
-          data.attendance[targetId][date][currentStudentId] = day[currentStudentId];
-          delete day[currentStudentId];
-        }
-      });
-
-      save();
-      closeStudentProfile();
-      render();
-
-      alert("✅ Student transferred successfully.");
     }
 
     function markAll(status) {
@@ -1272,26 +1173,33 @@
     function computeRanking(quarter, subject) {
       if (!activeClass) return [];
 
-      const w = data.weights;
-      const cacheKey = `${activeClass}-${quarter}-${subject}-${w.quiz}-${w.exam}-${w.project}`;
-
-      if (data.transmutation.locked[quarter] && cachedRankings[cacheKey]) {
-        return cachedRankings[cacheKey];
+      if (data.transmutation.locked[quarter]) {
+        const cacheKey = `${activeClass}-${quarter}-${subject}`;
+        if (cachedRankings[cacheKey]) {
+          return cachedRankings[cacheKey];
+        }
       }
+
+      const w = data.weights;
 
       const ranking = Object.entries(data.students[activeClass])
         .map(([sid]) => {
-          const g = data.grades[activeClass]?.[sid]?.[subject]?.[quarter] || { quiz: [], exam: [], project: [] };
+          const g =
+            data.grades[activeClass]?.[sid]?.[subject]?.[quarter] ||
+            { quiz: [], exam: [], project: [] };
+
           const hasScores = g.quiz.length || g.exam.length || g.project.length;
           if (!hasScores) return null;
+
           const raw = computeWeightedGrade(g.quiz, g.exam, g.project, w);
           return { sid, final: transmuteGrade(raw) };
         })
-        .filter(row => row !== null)
+        .filter(Boolean)
         .sort((a, b) => b.final - a.final)
         .map((x, i) => ({ ...x, rank: i + 1 }));
 
       if (data.transmutation.locked[quarter]) {
+        const cacheKey = `${activeClass}-${quarter}-${subject}`;
         cachedRankings[cacheKey] = ranking;
       }
 
@@ -1422,16 +1330,12 @@
 
       const s = data.students[activeClass][currentStudentId];
 
-      s.name = document.getElementById("sp-name-edit").value.trim() || s.name;
       s.studentId = document.getElementById("sp-studentId").value;
       s.birthdate = document.getElementById("sp-birthdate").value;
       s.guardian = document.getElementById("sp-guardian").value;
       s.mobile = document.getElementById("sp-mobile").value;
 
       save();
-      renderStudents();
-      renderGrades();
-      renderSF9();
     }
 
     function randomizeSeating() {
@@ -1510,18 +1414,14 @@
         document.getElementById('studentCount').textContent = '0';
         return;
       }
-      const students = Object.entries(data.students[activeClass] || {})
-        .filter(([_, s]) => s.status !== "dropped");
-      
-      list.innerHTML = students.map(([id, s]) => `
+      const students = data.students[activeClass] || {};
+      list.innerHTML = Object.entries(students).map(([id, s]) => `
         <li class="student-item cursor-pointer hover:bg-indigo-50" data-student-id="${id}">
           <span>${s.name}</span>
-          ${isAtRisk(id)
-            ? '<span class="badge badge-retained">⚠️ At Risk</span>'
-            : '<span class="badge badge-active">View</span>'}
+          <span class="badge badge-active">View</span>
         </li>
       `).join('');
-      document.getElementById('studentCount').textContent = students.length;
+      document.getElementById('studentCount').textContent = Object.keys(students).length;
 
       list.querySelectorAll('[data-student-id]').forEach(item => {
         item.addEventListener('click', function() {
@@ -1551,12 +1451,11 @@
         return;
       }
 
-      const students = Object.entries(data.students[activeClass] || {})
-        .filter(([_, s]) => s.status !== "dropped");
+      const students = data.students[activeClass] || {};
       const date = document.getElementById('attendanceDate').value;
       const dayAttendance = data.attendance[activeClass]?.[date] || {};
 
-      tbody.innerHTML = students.map(([id, s]) => {
+      tbody.innerHTML = Object.entries(students).map(([id, s]) => {
         const status = dayAttendance[id] || '';
         return `
           <tr>
@@ -1582,16 +1481,16 @@
         return;
       }
 
-      const students = Object.entries(data.students[activeClass] || {})
-        .filter(([_, s]) => s.status !== "dropped");
+      const students = data.students[activeClass] || {};
       const subject = document.getElementById('subject').value;
       const quarter = document.getElementById('quarter').value;
       const w = data.weights;
 
-      tbody.innerHTML = students.map(([id, s]) => {
+      tbody.innerHTML = Object.entries(students).map(([id, s]) => {
         const g = data.grades[activeClass]?.[id]?.[subject]?.[quarter] || { quiz: [], exam: [], project: [] };
 
-            
+        const hasScores = g.quiz.length > 0 || g.exam.length > 0 || g.project.length > 0;
+        if (!hasScores) return '';
 
         const raw = computeWeightedGrade(g.quiz, g.exam, g.project, w);
         const final = transmuteGrade(raw);
@@ -1601,52 +1500,17 @@
         return `
           <tr>
             <td><a href="#" class="student-link" data-student-id="${id}" style="color: #3b82f6; cursor: pointer;">${s.name}</a></td>
-<td style="text-align: center;">
-  <input
-    type="text"
-    placeholder="e.g. 85 or 17/20"
-    class="input text-xs w-20 text-center grade-input"
-    data-sid="${id}"
-    data-type="quiz"
-  />
-  <div class="text-xs text-gray-500 mt-1">
-    Avg: ${g.quiz.length ? avg(g.quiz).toFixed(1) : '-'}
-  </div>
-</td>
-<td style="text-align: center;">
-  <input
-    type="text"
-    placeholder="e.g. 85 or 17/20"
-    class="input text-xs w-20 text-center grade-input"
-    data-sid="${id}"
-    data-type="exam"
-  />
-  <div class="text-xs text-gray-500 mt-1">
-    Avg: ${g.exam.length ? avg(g.exam).toFixed(1) : '-'}
-  </div>
-</td>
-<td style="text-align: center;">
-  <input
-    type="text"
-    placeholder="e.g. 85 or 17/20"
-    class="input text-xs w-20 text-center grade-input"
-    data-sid="${id}"
-    data-type="project"
-  />
-  <div class="text-xs text-gray-500 mt-1">
-    Avg: ${g.project.length ? avg(g.project).toFixed(1) : '-'}
-  </div>
-</td>
+            <td style="text-align: center;"><span style="background: #f0f4ff; padding: 4px 8px; border-radius: 4px;">${avg(g.quiz).toFixed(1)}</span></td>
+            <td style="text-align: center;"><span style="background: #f0f4ff; padding: 4px 8px; border-radius: 4px;">${avg(g.exam).toFixed(1)}</span></td>
+            <td style="text-align: center;"><span style="background: #f0f4ff; padding: 4px 8px; border-radius: 4px;">${avg(g.project).toFixed(1)}</span></td>
             <td style="text-align: center;"><strong style="font-size: 14px; color: #667eea;">${final}</strong></td>
             <td style="text-align: center;"><strong style="font-size: 14px;">${rank}</strong></td>
           </tr>
         `;
       }).filter(Boolean).join('');
 
-      const mode = data.transmutation.mode || 'deped';
-      document
-        .querySelector(`input[name="transMode"][value="${mode}"]`)
-        ?.setAttribute("checked", "checked");
+      const mode = document.querySelector('input[name="transMode"]:checked')?.value || 'deped';
+      document.querySelector('input[name="transMode"][value="' + mode + '"]').checked = true;
 
       document.querySelectorAll('.student-link').forEach(link => {
         link.addEventListener('click', function(e) {
@@ -1708,7 +1572,6 @@
       const subjects = data.subjects[activeClass] || ["Math"];
 
       document.getElementById("sp-name").textContent = student.name;
-      document.getElementById("sp-name-edit").value = student.name;
       document.getElementById("sp-class").textContent = className;
 
       document.getElementById("sp-studentId").value = student.studentId || "";
@@ -1778,7 +1641,7 @@
       const att = attendanceSummary(studentId);
 
       document.getElementById("sp-average").textContent = genAve;
-      document.getElementById("sp-status").textContent = status + (isAtRisk(studentId) ? " ⚠️" : "");
+      document.getElementById("sp-status").textContent = status;
       document.getElementById("sp-rank").textContent = "—";
       document.getElementById("att-present").textContent = att.present;
       document.getElementById("att-absent").textContent = att.absent;
@@ -1794,15 +1657,6 @@
 
       renderBehaviorNotes();
       document.getElementById("auto-remarks").textContent = generateAutoRemarks(studentId);
-      
-      const history = student.transferHistory || [];
-      document.getElementById("transfer-history").innerHTML =
-        history.length
-          ? history.map(h =>
-              `<li>${h.date}: ${h.from} → ${h.to}</li>`
-            ).join("")
-          : "<li>No transfers recorded.</li>";
-
       document.getElementById("student-modal").classList.remove("hidden");
 
       document.querySelectorAll('.delete-score-btn').forEach(btn => {
@@ -1943,114 +1797,6 @@
       doc.save(`SF9-${s.name}-${activeYear}.pdf`);
     }
 
-    function exportForm137PDF() {
-      const sid = document.getElementById('sf9Student')?.value || currentStudentId;
-      if (!sid || !activeClass) {
-        alert("Please select a student.");
-        return;
-      }
-
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF("p", "mm", "a4");
-
-      const s = data.students[activeClass][sid];
-      const className = data.classes[activeClass].name;
-      const school = data.schoolInfo.name || "";
-      const adviser = data.schoolInfo.adviser || "";
-      const subjects = data.subjects[activeClass] || ["Math"];
-
-      let y = 15;
-
-      /* ===== HEADER ===== */
-      doc.setFontSize(14);
-      doc.text("FORM 137 – PERMANENT ACADEMIC RECORD", 105, y, { align: "center" });
-      y += 8;
-
-      doc.setFontSize(10);
-      doc.text(`School: ${school}`, 15, y); y += 5;
-      doc.text(`Class: ${className}`, 15, y); y += 5;
-      doc.text(`School Year: ${activeYear}`, 15, y); y += 8;
-
-      /* ===== LEARNER INFO ===== */
-      doc.setFontSize(11);
-      doc.text("LEARNER INFORMATION", 15, y); y += 5;
-      doc.setFontSize(10);
-      doc.text(`Name: ${s.name}`, 15, y); y += 5;
-      doc.text(`Student ID: ${s.studentId || "-"}`, 15, y); y += 5;
-      doc.text(`Birthdate: ${s.birthdate || "-"}`, 15, y); y += 5;
-      doc.text(`Parent/Guardian: ${s.guardian || "-"}`, 15, y); y += 8;
-
-      /* ===== TABLE HEADER ===== */
-      doc.setFontSize(10);
-      doc.text("Subject", 15, y);
-      doc.text("Q1", 70, y);
-      doc.text("Q2", 85, y);
-      doc.text("Q3", 100, y);
-      doc.text("Q4", 115, y);
-      doc.text("Final", 135, y);
-      doc.text("Remarks", 160, y);
-      y += 3;
-      doc.line(15, y, 195, y);
-      y += 5;
-
-      let total = 0, count = 0;
-
-      subjects.forEach(subj => {
-        let finals = [];
-        ['Q1','Q2','Q3','Q4'].forEach(q => {
-          const g = data.grades[activeClass]?.[sid]?.[subj]?.[q];
-          if (g && (g.quiz.length || g.exam.length || g.project.length)) {
-            const raw = computeWeightedGrade(g.quiz, g.exam, g.project, data.weights);
-            finals.push(transmuteGrade(raw));
-          } else {
-            finals.push("-");
-          }
-        });
-
-        const valid = finals.filter(v => typeof v === "number");
-        const finalAve = valid.length ? (valid.reduce((a,b)=>a+b,0)/valid.length).toFixed(0) : "-";
-        const remark = finalAve >= 75 ? "PASSED" : "FAILED";
-
-        if (typeof finalAve === "string" && finalAve !== "-") {
-          total += Number(finalAve);
-          count++;
-        }
-
-        doc.text(subj, 15, y);
-        doc.text(String(finals[0]), 70, y);
-        doc.text(String(finals[1]), 85, y);
-        doc.text(String(finals[2]), 100, y);
-        doc.text(String(finals[3]), 115, y);
-        doc.text(String(finalAve), 135, y);
-        doc.text(remark, 160, y);
-
-        y += 6;
-        if (y > 260) {
-          doc.addPage();
-          y = 20;
-        }
-      });
-
-      /* ===== SUMMARY ===== */
-      y += 6;
-      const genAve = count ? (total / count).toFixed(1) : "-";
-      const status = promotionStatus(sid);
-
-      doc.setFontSize(11);
-      doc.text(`General Average: ${genAve}`, 15, y); y += 6;
-      doc.text(`Promotion Status: ${status}`, 15, y); y += 10;
-
-      /* ===== CERTIFICATION ===== */
-      doc.setFontSize(10);
-      doc.text("Certified Correct:", 15, y); y += 10;
-      doc.text(adviser, 15, y);
-      doc.text("Class Adviser", 15, y + 5);
-
-      doc.text(`Date Issued: ${new Date().toLocaleDateString()}`, 130, y);
-
-      doc.save(`Form137-${s.name}-${activeYear}.pdf`);
-    }
-
     function renderSF9() {
       const sid = document.getElementById('sf9Student').value;
       const content = document.getElementById('sf9Content');
@@ -2122,11 +1868,9 @@
         return;
       }
       sel.innerHTML = '<option value="">-- Choose Student --</option>' +
-        Object.entries(data.students[activeClass])
-          .filter(([_, s]) => s.status !== "dropped")
-          .map(([id, s]) => `
-            <option value="${id}">${s.name}</option>
-          `).join('');
+        Object.entries(data.students[activeClass]).map(([id, s]) => `
+          <option value="${id}">${s.name}</option>
+        `).join('');
     }
 
     function printSF9() {
@@ -2144,13 +1888,12 @@
 
       if (!activeClass) return;
 
-      const students = Object.entries(data.students[activeClass] || {})
-        .filter(([_, s]) => s.status !== "dropped");
+      const students = data.students[activeClass] || {};
       const seating = data.seating[activeClass] || [];
       const seatedIds = new Set(seating.filter(Boolean));
 
       seating.forEach((sid, i) => {
-        const st = students.find(([id]) => id === sid)?.[1];
+        const st = students[sid];
         grid.innerHTML += `
           <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; background: #f8fafc; min-height: 64px; display: flex; align-items: center; justify-content: center; text-align: center;"
                data-seat-index="${i}">
@@ -2162,7 +1905,7 @@
         `;
       });
 
-      students.forEach(([sid, st]) => {
+      Object.entries(students).forEach(([sid, st]) => {
         if (!seatedIds.has(sid)) {
           unseated.innerHTML += `
             <div draggable="${!isArchivedYear()}" data-dragged-id="${sid}" style="background: #e2e8f0; padding: 8px 12px; border-radius: 6px; font-size: 12px; cursor: ${isArchivedYear() ? 'not-allowed' : 'move'};">
@@ -2197,9 +1940,7 @@
     function stats() {
       let totalStudents = 0;
       Object.values(data.students).forEach(cls => {
-        Object.values(cls).forEach(s => {
-          if (s.status !== "dropped") totalStudents++;
-        });
+        totalStudents += Object.keys(cls).length;
       });
 
       let gradeCount = 0;
@@ -2235,20 +1976,7 @@
           new Date().toISOString().slice(0, 10);
       if (section === 'grades') renderSubjects();
     }
-    function bindGradeInputs() {
-  document.querySelectorAll('.grade-input').forEach(input => {
-    input.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        addScore(
-          e.target.dataset.sid,
-          e.target.dataset.type,
-          e.target.value
-        );
-        e.target.value = '';
-      }
-    });
-  });
-}
+
     function render() {
       renderSchoolYears();
       renderNav();
@@ -2258,15 +1986,12 @@
       renderAttendance();
       renderSubjects();
       renderGrades();
-      bindGradeInputs();    
-      
       renderSeating();
       stats();
       updateEditability();
-      forceEnableBootstrapActions();
       applyClassLock();
       attachEventListeners();
-}
+    }
 
     function attachEventListeners() {
       if (eventsBound) return;
@@ -2298,8 +2023,6 @@
 
       // Students
       document.getElementById('btnAddStudent').addEventListener('click', addStudent);
-      document.getElementById('btnTransferStudent').addEventListener('click', transferStudent);
-      document.getElementById('btnDropStudent').addEventListener('click', dropStudent);
 
       // Attendance
       document.getElementById('btnMarkAll1').addEventListener('click', () => markAll('present'));
@@ -2334,7 +2057,6 @@
       // SF9
       document.getElementById('sf9Student').addEventListener('change', renderSF9);
       document.getElementById('btnPrintSF9').addEventListener('click', exportSF9PDF);
-      document.getElementById('btnExportF137').addEventListener('click', exportForm137PDF);
       document.getElementById('btnShareParent').addEventListener('click', () => {
         showParentShare(document.getElementById('sf9Student').value);
       });
@@ -2380,21 +2102,19 @@
 
       document.getElementById("tour-skip").addEventListener("click", endTour);
     }
-    
-    document.body.classList.remove("parent-view");
-document.getElementById("parentBanner").style.display = "none";
 
     document.addEventListener("DOMContentLoaded", () => {
-  teacherName = "TEST_TEACHER";
-  localStorage.setItem("teacherName", teacherName);
+      try {
+        activeClass = localStorage.getItem('activeClass') || '';
+        render();
+        document.getElementById('attendanceDate').value =
+          new Date().toISOString().slice(0, 10);
 
-  activeClass = localStorage.getItem('activeClass') || '';
-  render();
-
-  document.getElementById('attendanceDate').value =
-    new Date().toISOString().slice(0, 10);
-
-  setTimeout(startTour, 600);
-});
-  </body>
+        setTimeout(startTour, 600);
+      } catch (e) {
+        // fail silently
+      }
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9cfc54994390febc',t:'MTc3MTQwNTE4OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
