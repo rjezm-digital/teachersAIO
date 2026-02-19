@@ -782,9 +782,13 @@ localStorage.setItem("teacherName", teacherName);
     data.transmutation ??= { mode: 'deped', locked: {}, customTable: [] };
 
     Object.keys(data.classes).forEach(id => {
-      if (!data.classes[id].pin) data.classes[id].pin = '';
-      if (!data.classes[id].unlocked) data.classes[id].unlocked = false;
-    });
+  const c = data.classes[id];
+
+  // ensure fields exist ONLY
+  if (c.pin === undefined) c.pin = '';
+  if (c.unlocked === undefined) c.unlocked = true;
+  if (!c.owner) c.owner = teacherName;
+});
 
     if (params.get("parent") === "1") {
       document.body.classList.add("parent-view");
