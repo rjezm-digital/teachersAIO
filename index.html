@@ -989,15 +989,16 @@ localStorage.setItem("teacherName", teacherName);
     }
 
     function selectClass(id) {
-      activeClass = id;
-      if (data.classes[id]) {
-        data.classes[id].unlocked = false;
-      }
-      localStorage.setItem('activeClass', id);
-      save();
-      applyClassLock();
-      render();
-    }
+  activeClass = id;
+
+  // ❌ DO NOT auto-lock on select
+  // unlocking is controlled ONLY by PIN logic
+
+  localStorage.setItem('activeClass', id);
+  save();
+  applyClassLock();
+  render();
+}
 
     function getParentLink(studentId) {
       const baseUrl = `${location.origin}${location.pathname}`;
