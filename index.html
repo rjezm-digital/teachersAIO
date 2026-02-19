@@ -308,7 +308,7 @@
           <th style="text-align: center;">🕐 Late</th>
          </tr>
         </thead>
-        <tbody id="attendanceTable"></tbody>
+            <tbody id="attendanceTable"></tbody>
        </table>
       </div>
      </section>
@@ -1444,6 +1444,7 @@ localStorage.setItem("teacherName", teacherName);
 
     function renderAttendance() {
   const tbody = document.getElementById('attendanceTable');
+
   if (!activeClass) {
     tbody.innerHTML = '';
     return;
@@ -1457,23 +1458,23 @@ localStorage.setItem("teacherName", teacherName);
 
   const dayAttendance = data.attendance[activeClass][date];
 
-  tbody.innerHTML = Object.entries(students).map(([id, s]) => {
-    const status = dayAttendance[id] || '';
-    return `
-      <tr>
-        <td>${s.name}</td>
-        <td style="text-align:center">
-          <input type="radio" name="att-${id}" ${status === 'present' ? 'checked' : ''} data-att="${id}" data-status="present">
-        </td>
-        <td style="text-align:center">
-          <input type="radio" name="att-${id}" ${status === 'absent' ? 'checked' : ''} data-att="${id}" data-status="absent">
-        </td>
-        <td style="text-align:center">
-          <input type="radio" name="att-${id}" ${status === 'late' ? 'checked' : ''} data-att="${id}" data-status="late">
-        </td>
-      </tr>
-    `;
-  }).join('');
+  tbody.innerHTML = Object.entries(students).map(([id, s]) => `
+    <tr>
+      <td>${s.name}</td>
+      <td style="text-align:center">
+        <input type="radio" name="att-${id}" ${dayAttendance[id]==='present'?'checked':''}
+          data-att="${id}" data-status="present">
+      </td>
+      <td style="text-align:center">
+        <input type="radio" name="att-${id}" ${dayAttendance[id]==='absent'?'checked':''}
+          data-att="${id}" data-status="absent">
+      </td>
+      <td style="text-align:center">
+        <input type="radio" name="att-${id}" ${dayAttendance[id]==='late'?'checked':''}
+          data-att="${id}" data-status="late">
+      </td>
+    </tr>
+  `).join('');
 
   tbody.querySelectorAll('input[data-att]').forEach(input => {
     input.addEventListener('change', function () {
@@ -1482,72 +1483,72 @@ localStorage.setItem("teacherName", teacherName);
   });
 }
 
-    function renderGrades() {
-      const tbody = document.getElementById('gradesTable');
-      if (!activeClass) {
-        tbody.innerHTML = '';
-        return;
-      }
+function renderGrades() {
+  const tbody = document.getElementById('gradesTable');
 
-      const students = data.students[activeClass] || {};
-      const subjectSelect = document.getElementById('subject');
+  if (!activeClass) {
+    tbody.innerHTML = '';
+    return;
+  }
 
-// ✅ FIX 1: ensure a subject is selected
-if (!subjectSelect.value) {
-  subjectSelect.value = data.subjects[activeClass]?.[0] || "";
+  const students = data.students[activeClass] || {};
+  const subjectSelect = document.getElementById('subject');
+
+  if (!subjectSelect.value) {
+    subjectSelect.value = data.subjects[activeClass]?.[0] || "";
+  }
+
+  const subject = subjectSelect.value;
+  const quarter = document.getElementById('quarter').value;
+  const w = data.weights;
+
+  tbody.innerHTML = Object.entries(students).map(([id, s]) => {
+    const g = data.grades[activeClass]?.[id]?.[subject]?.[quarter] ||
+              { quiz: [], exam: [], project: [] };
+
+    const raw = computeWeightedGrade(g.quiz, g.exam, g.project, w);
+    const final = transmuteGrade(raw);
+    const rank = computeRanking(quarter, subject)
+                  .find(r => r.sid === id)?.rank || '-';
+
+    return `
+      <tr>
+        <td>
+          <a href="#" class="student-link" data-student-id="${id}">
+            ${s.name}
+          </a>
+        </td>
+
+        <td style="text-align:center">
+          <input class="input text-xs w-20 text-center"
+            onchange="addScore('${id}','quiz',this.value)">
+        </td>
+
+        <td style="text-align:center">
+          <input class="input text-xs w-20 text-center"
+            onchange="addScore('${id}','exam',this.value)">
+        </td>
+
+        <td style="text-align:center">
+          <input class="input text-xs w-20 text-center"
+            onchange="addScore('${id}','project',this.value)">
+        </td>
+
+        <td style="text-align:center"><b>${final || '-'}</b></td>
+        <td style="text-align:center"><b>${rank}</b></td>
+      </tr>
+    `;
+  }).join('');
+
+  document.querySelectorAll('.student-link').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      openStudentProfile(link.dataset.studentId);
+    });
+  });
 }
-
-const subject = subjectSelect.value;
-      const quarter = document.getElementById('quarter').value;
-      const w = data.weights;
-
-      tbody.innerHTML = Object.entries(students).map(([id, s]) => {
-        const g = data.grades[activeClass]?.[id]?.[subject]?.[quarter] || { quiz: [], exam: [], project: [] };
-
-const hasScores =
-  g.quiz.length > 0 ||
-  g.exam.length > 0 ||
-  g.project.length > 0;
-  
-if (!hasScores) {
-  return `
-    <tr>
-      <td>${s.name}</td>
-      <td colspan="5" style="text-align:center;color:#9ca3af;">
-        No grades yet
-      </td>
-    </tr>
-  `;
-}
-
-        const raw = computeWeightedGrade(g.quiz, g.exam, g.project, w);
-        const final = transmuteGrade(raw);
-        const ranking = computeRanking(quarter, subject);
-        const rank = ranking.find(r => r.sid === id)?.rank || '-';
-
-        return `
-          <tr>
-            <td><a href="#" class="student-link" data-student-id="${id}" style="color: #3b82f6; cursor: pointer;">${s.name}</a></td>
-            <td style="text-align: center;"><span style="background: #f0f4ff; padding: 4px 8px; border-radius: 4px;">${avg(g.quiz).toFixed(1)}</span></td>
-            <td style="text-align: center;"><span style="background: #f0f4ff; padding: 4px 8px; border-radius: 4px;">${avg(g.exam).toFixed(1)}</span></td>
-            <td style="text-align: center;"><span style="background: #f0f4ff; padding: 4px 8px; border-radius: 4px;">${avg(g.project).toFixed(1)}</span></td>
-            <td style="text-align: center;"><strong style="font-size: 14px; color: #667eea;">${final}</strong></td>
-            <td style="text-align: center;"><strong style="font-size: 14px;">${rank}</strong></td>
-          </tr>
-        `;
-      }).filter(Boolean).join('');
-
-      const mode = document.querySelector('input[name="transMode"]:checked')?.value || 'deped';
-      document.querySelector('input[name="transMode"][value="' + mode + '"]').checked = true;
-
-      document.querySelectorAll('.student-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-          e.preventDefault();
-          openStudentProfile(this.dataset.studentId);
-        });
-      });
-    }
-
+      
+    
     function addBehaviorNote() {
       if (isArchivedYear()) return;
       const note = document.getElementById("behavior-note").value.trim();
@@ -2005,6 +2006,7 @@ if (!hasScores) {
       if (section === 'grades') {
   renderSubjects();
   renderGrades(); // ✅ force re-render AFTER subjects load
+}
 }
 
     function render() {
